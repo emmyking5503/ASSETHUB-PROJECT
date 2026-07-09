@@ -1,0 +1,1164 @@
+
+{% extends "seller/basee.html" %}
+{% load static %}
+
+{% block page_title %}Add Product{% endblock %}
+
+{% block extra_css %}
+
+<style>
+        /* ============================================
+    ADD PRODUCT PAGE - STYLES
+    ============================================ */
+
+    :root {
+        --primary: #4F46E5;
+        --primary-dark: #4338CA;
+        --primary-light: #EEF2FF;
+        --secondary: #10B981;
+        --danger: #EF4444;
+        --warning: #F59E0B;
+        
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-300: #D1D5DB;
+        --gray-400: #9CA3AF;
+        --gray-500: #6B7280;
+        --gray-600: #4B5563;
+        --gray-700: #374151;
+        --gray-800: #1F2937;
+        --gray-900: #111827;
+        
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        
+        --radius: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--gray-50);
+        color: var(--gray-800);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================
+    LAYOUT
+    ============================================ */
+
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 260px;
+        background: white;
+        border-right: 1px solid var(--gray-200);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+        z-index: 50;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid var(--gray-100);
+        padding: 0 1.5rem;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-decoration: none;
+    }
+
+    .logo span {
+        color: var(--gray-400);
+        font-weight: 300;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem 0.75rem;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--gray-600);
+        text-decoration: none;
+        border-radius: var(--radius);
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        margin-bottom: 0.25rem;
+    }
+
+    .nav-link:hover {
+        background-color: var(--gray-50);
+        color: var(--primary);
+    }
+
+    .nav-link.active {
+        background-color: var(--primary-light);
+        color: var(--primary);
+        position: relative;
+    }
+
+    .nav-link.active::before {
+        content: '';
+        position: absolute;
+        left: -0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 20px;
+        background-color: var(--primary);
+        border-radius: 0 2px 2px 0;
+    }
+
+    /* Main Content */
+    .main-content {
+        flex: 1;
+        margin-left: 260px;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* Top Navbar */
+    .top-navbar {
+        height: 64px;
+        background: white;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        position: sticky;
+        top: 0;
+        z-index: 40;
+    }
+
+    .navbar-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: var(--gray-500);
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .profile-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: var(--radius);
+        transition: background-color 0.2s;
+    }
+
+    .profile-btn:hover {
+        background-color: var(--gray-50);
+    }
+
+    .profile-img {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--gray-200);
+    }
+
+    /* Page Content */
+    .page-content {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+    }
+
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* ============================================
+    FORM SECTIONS
+    ============================================ */
+
+    .form-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-100);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+    }
+
+    .section-subtitle {
+        font-size: 0.875rem;
+        color: var(--gray-500);
+    }
+
+    /* ============================================
+    FORM ELEMENTS
+    ============================================ */
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-label .required {
+        color: var(--danger);
+        margin-left: 0.25rem;
+    }
+
+    .form-label .optional {
+        color: var(--gray-400);
+        font-weight: 400;
+        margin-left: 0.25rem;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: 0.625rem 0.875rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius);
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        background-color: white;
+        width: 100%;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    /* Input with prefix */
+    .input-prefix {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .prefix {
+        position: absolute;
+        left: 0.875rem;
+        color: var(--gray-500);
+        font-weight: 500;
+    }
+
+    .form-input.with-prefix {
+        padding-left: 2rem;
+    }
+
+    /* Radio Group */
+    .radio-group {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .radio-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        color: var(--gray-700);
+    }
+
+    .radio-label input[type="radio"] {
+        display: none;
+    }
+
+    .radio-custom {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--gray-300);
+        border-radius: 50%;
+        position: relative;
+        transition: all 0.2s;
+    }
+
+    .radio-label input[type="radio"]:checked + .radio-custom {
+        border-color: var(--primary);
+        background-color: var(--primary);
+    }
+
+    .radio-label input[type="radio"]:checked + .radio-custom::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 6px;
+        height: 6px;
+        background: white;
+        border-radius: 50%;
+    }
+
+    /* ============================================
+    IMAGE UPLOAD
+    ============================================ */
+
+    .image-upload-container {
+        margin-top: 0.5rem;
+    }
+
+    .upload-zone {
+        border: 2px dashed var(--gray-300);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background-color: var(--gray-50);
+        position: relative;
+    }
+
+    .upload-zone:hover {
+        border-color: var(--primary);
+        background-color: var(--primary-light);
+    }
+
+    .file-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload-icon {
+        font-size: 2.5rem;
+        color: var(--gray-400);
+        margin-bottom: 1rem;
+    }
+
+    .upload-text {
+        font-size: 0.875rem;
+        color: var(--gray-700);
+        margin-bottom: 0.25rem;
+    }
+
+    .upload-text strong {
+        color: var(--primary);
+    }
+
+    .upload-hint {
+        font-size: 0.75rem;
+        color: var(--gray-400);
+    }
+
+    .image-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .preview-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+
+    .preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .preview-remove {
+        position: absolute;
+        top: 0.25rem;
+        right: 0.25rem;
+        width: 24px;
+        height: 24px;
+        background: var(--danger);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .preview-item:hover .preview-remove {
+        opacity: 1;
+    }
+
+    /* ============================================
+    SPECIFICATIONS SECTION
+    ============================================ */
+
+    .specifications-section {
+        background: linear-gradient(to bottom, white, var(--gray-50));
+    }
+
+    .specifications-section .section-header {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .btn-add-spec {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-add-spec:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-add-spec:active {
+        transform: translateY(0);
+    }
+
+    .specifications-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    /* Empty State */
+    .spec-row.empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--gray-400);
+    }
+
+    .empty-icon {
+        width: 64px;
+        height: 64px;
+        background: var(--gray-100);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        color: var(--gray-400);
+    }
+
+    .empty-state p {
+        font-weight: 500;
+        color: var(--gray-600);
+        margin-bottom: 0.25rem;
+    }
+
+    .empty-state span {
+        font-size: 0.875rem;
+    }
+
+    /* Specification Row */
+    .spec-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 0.75rem;
+        align-items: flex-start;
+        padding: 1rem;
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .spec-input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .spec-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        margin-bottom: 0.375rem;
+    }
+
+    .spec-input {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius);
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        background-color: white;
+    }
+
+    .spec-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .spec-input::placeholder {
+        color: var(--gray-400);
+    }
+
+    .btn-remove-spec {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--gray-100);
+        color: var(--gray-500);
+        border: none;
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 1.375rem;
+    }
+
+    .btn-remove-spec:hover {
+        background: #FEE2E2;
+        color: var(--danger);
+    }
+
+    /* Spec Counter */
+    .spec-counter {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--gray-200);
+        font-size: 0.875rem;
+        color: var(--gray-500);
+    }
+
+    .spec-counter .count {
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    /* ============================================
+    BUTTONS
+    ============================================ */
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding-top: 1rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--radius);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+        background-color: white;
+        color: var(--gray-700);
+        border: 1px solid var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--gray-50);
+        border-color: var(--gray-400);
+    }
+
+    /* ============================================
+    MOBILE OVERLAY
+    ============================================ */
+
+    .mobile-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 40;
+    }
+
+    /* ============================================
+    RESPONSIVE
+    ============================================ */
+
+    @media (max-width: 1024px) {
+        .sidebar {
+            transform: translateX(-100%);
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            margin-left: 0;
+        }
+        
+        .menu-toggle {
+            display: block;
+        }
+        
+        .mobile-overlay.show {
+            display: block;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-content {
+            padding: 1rem;
+        }
+        
+        .form-section {
+            padding: 1.25rem;
+        }
+        
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .btn-add-spec {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .spec-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        .btn-remove-spec {
+            margin-top: 0;
+            width: 100%;
+            height: 40px;
+        }
+        
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .top-navbar {
+            padding: 0 1rem;
+        }
+        
+        .page-title {
+            font-size: 1.125rem;
+        }
+    }
+    .notification {
+    position: fixed;
+    top: 20px;
+    right: -300px;
+    background: #4caf50;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    transition: all 0.5s ease;
+    z-index: 9999;
+}
+
+    .notification.error { background: #f44336; }
+    .notification.show { right: 20px; }
+</style>
+
+{% endblock %}
+
+{% block content %}
+    <!-- Page Content -->
+     <!-- Add this near the end of your body -->
+    <div id="notificationContainer" class="notification"></div>
+    <div class="page-content">
+        <div class="form-container">
+            <form id="addProductForm"
+                method="POST"
+                action="{% url 'add_product' %}"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Basic Information -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Basic Information</h2>
+                        <p class="section-subtitle">Enter the main details about your product</p>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label" for="productName">
+                                Product Name <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="productName"
+                                name="productName" 
+                                class="form-input" 
+                                placeholder="e.g., Premium Wireless Headphones"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="category">
+                                Category <span class="required">*</span>
+                            </label>
+                            <select id="category" class="form-select" required name="category">
+                                <option value="">Select Category</option>
+                                {% for cat in categories %}
+                                    <option value="{{ cat.slug }}">{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="sku">SKU / Product Code</label>
+                            <input 
+                                type="text" 
+                                id="sku" 
+                                name="sku"
+                                class="form-input" 
+                                placeholder="e.g., PRD-001"
+                            >
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label" for="description">
+                                Description <span class="required">*</span>
+                            </label>
+                            <textarea 
+                                id="description" 
+                                class="form-textarea" 
+                                rows="4"
+                                name="description"
+                                placeholder="Describe your product in detail..."
+                                required
+                            ></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pricing & Inventory -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Pricing & Inventory</h2>
+                        <p class="section-subtitle">Set your pricing and stock information</p>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="price">
+                                Price ($) <span class="required">*</span>
+                            </label>
+                            <div class="input-prefix">
+                                <span class="prefix">$</span>
+                                <input 
+                                    type="number" 
+                                    id="price" 
+                                    name="price"
+                                    class="form-input with-prefix" 
+                                    placeholder="0.00"
+                                    step="0.01"
+                                    min="0"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="oldPrice">
+                                Old Price ($) <span class="optional">(Optional)</span>
+                            </label>
+                            <div class="input-prefix">
+                                <span class="prefix">$</span>
+                                <input 
+                                    type="number" 
+                                    id="oldPrice" 
+                                    name="oldPrice"
+                                    class="form-input with-prefix" 
+                                    placeholder="0.00"
+                                    step="0.01"
+                                    min="0"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="quantity">
+                                Quantity <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="quantity" 
+                                name="quantity"
+                                class="form-input" 
+                                placeholder="0"
+                                min="0"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Product Type</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="productType" value="physical" checked>
+                                    <span class="radio-custom"></span>
+                                    <span>Physical</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="productType" value="digital">
+                                    <span class="radio-custom"></span>
+                                    <span>Digital</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Product Images</h2>
+                        <p class="section-subtitle">Upload product images</p>
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Front Image <span class="required">*</span>
+                            </label>
+                            <input type="file"
+                                name="front_image"
+                                class="form-input"
+                                accept="image/*"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Back Image</label>
+                            <input type="file"
+                                name="back_image"
+                                class="form-input"
+                                accept="image/*">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Side Image</label>
+                            <input type="file"
+                                name="side_image"
+                                class="form-input"
+                                accept="image/*">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Extra Image</label>
+                            <input type="file"
+                                name="extra_image"
+                                class="form-input"
+                                accept="image/*">
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- DYNAMIC SPECIFICATIONS SECTION -->
+                <section class="form-section specifications-section">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Product Specifications</h2>
+                            <p class="section-subtitle">Add custom specifications for your product (Brand, Material, Size, etc.)</p>
+                        </div>
+                        <button type="button" class="btn-add-spec" id="btnAddSpec">
+                            <i class="fa-solid fa-plus"></i>
+                            Add Specification
+                        </button>
+                    </div>
+                    
+                    <div class="specifications-container" id="specificationsContainer">
+                        <!-- Specification rows will be added here dynamically -->
+                        <div class="spec-row empty-state" id="emptyState">
+                            <div class="empty-icon">
+                                <i class="fa-solid fa-clipboard-list"></i>
+                            </div>
+                            <p>No specifications added yet</p>
+                            <span>Click "Add Specification" to add product details like Brand, Material, Weight, etc.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary">Save as Draft</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-check"></i>
+                        Publish Product
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    
+{% endblock %}
+
+{% block extra_js  %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // -------------------------------
+            // Specifications Manager
+            // -------------------------------
+            const specificationsContainer = document.getElementById('specificationsContainer');
+            const btnAddSpec = document.getElementById('btnAddSpec');
+            const emptyState = document.getElementById('emptyState');
+            let specCount = 0;
+
+            btnAddSpec.addEventListener('click', () => addSpecificationRow());
+
+            function addSpecificationRow(name = '', value = '') {
+                if (emptyState) emptyState.style.display = 'none';
+                specCount++;
+
+                const specRow = document.createElement('div');
+                specRow.className = 'spec-row';
+                specRow.dataset.index = specCount;
+
+                // Name
+                const nameGroup = document.createElement('div');
+                nameGroup.className = 'spec-input-group';
+                const nameLabel = document.createElement('label');
+                nameLabel.className = 'spec-label';
+                nameLabel.textContent = 'Specification Name';
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.className = 'spec-input';
+                nameInput.name = `spec_name_${specCount}`;
+                nameInput.placeholder = 'e.g., Brand, Material, Size';
+                nameInput.value = name;
+                nameInput.required = true;
+                nameGroup.append(nameLabel, nameInput);
+
+                // Value
+                const valueGroup = document.createElement('div');
+                valueGroup.className = 'spec-input-group';
+                const valueLabel = document.createElement('label');
+                valueLabel.className = 'spec-label';
+                valueLabel.textContent = 'Specification Value';
+                const valueInput = document.createElement('input');
+                valueInput.type = 'text';
+                valueInput.className = 'spec-input';
+                valueInput.name = `spec_value_${specCount}`;
+                valueInput.placeholder = 'e.g., Rolex, Cotton, Large';
+                valueInput.value = value;
+                valueInput.required = true;
+                valueGroup.append(valueLabel, valueInput);
+
+                // Remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn-remove-spec';
+                removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+                removeBtn.title = 'Remove specification';
+                removeBtn.addEventListener('click', () => removeSpecificationRow(specRow));
+
+                specRow.append(nameGroup, valueGroup, removeBtn);
+                specificationsContainer.appendChild(specRow);
+                nameInput.focus();
+                updateSpecCounter();
+            }
+
+            function removeSpecificationRow(row) {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(20px)';
+                setTimeout(() => {
+                    row.remove();
+                    const remainingRows = specificationsContainer.querySelectorAll('.spec-row:not(.empty-state)');
+                    if (remainingRows.length === 0 && emptyState) emptyState.style.display = 'block';
+                    updateSpecCounter();
+                }, 300);
+            }
+
+            function updateSpecCounter() {
+                const existingCounter = specificationsContainer.querySelector('.spec-counter');
+                if (existingCounter) existingCounter.remove();
+                const rows = specificationsContainer.querySelectorAll('.spec-row:not(.empty-state)');
+                if (rows.length > 0) {
+                    const counter = document.createElement('div');
+                    counter.className = 'spec-counter';
+                    counter.innerHTML = `<i class="fa-solid fa-list-check"></i> <span><span class="count">${rows.length}</span> specification${rows.length !== 1 ? 's' : ''} added</span>`;
+                    specificationsContainer.appendChild(counter);
+                }
+            }
+
+        
+
+        
+
+            // -------------------------------
+            // Toast Notification Function
+            // -------------------------------
+            function showNotification(message, type='success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `<i class="fa-solid ${type==='success' ? 'fa-check' : 'fa-exclamation'}"></i> ${message}`;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.classList.add('show'), 50);
+                setTimeout(() => notification.remove(), 3000);
+            }
+
+        });
+    </script>
+{% endblock %}

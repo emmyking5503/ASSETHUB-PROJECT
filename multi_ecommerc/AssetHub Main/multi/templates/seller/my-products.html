@@ -1,0 +1,132 @@
+{% extends "seller/basee.html" %}
+{% load static %}
+
+{% block page_title %}My-Product{% endblock %}
+
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+   
+    <div class="page-content">
+        <!-- Filter Bar -->
+        <form method="GET">
+            <div class="filter-bar">
+                <div class="filter-search">
+                    <input type="text" id="liveSearch" placeholder="Search products...">
+                </div>
+
+                <div class="filter-actions">
+
+                    <!-- Category Filter -->
+                    <select id="categoryFilter" class="form-select">
+                        <option value="">All Category</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Status Filter -->
+                    <select id="statusFilter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="published">Published</option>
+                        <option value="outofstock">Out of Stock</option>
+                    </select>
+
+                    
+
+                </div>
+            </div>
+                <!-- Delete Confirmation Modal -->
+            <div id="deleteModal" class="modal" style="display: none;">
+                <div class="modal-content" style="max-width: 400px; margin: 10% auto; padding: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center;">
+                    <h2 style="margin-bottom: 1rem;">Confirm Delete</h2>
+                    <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+                    <div style="margin-top: 2rem; display: flex; justify-content: space-around;">
+                        <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
+                        <button id="confirmDelete" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+                <div class="modal-overlay" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);"></div>
+            </div>
+        </form>
+
+        <div id="productGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+
+            {% include "seller/partials/product-grid.html" %}
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js  %}
+        <script>
+            const searchInput = document.getElementById("liveSearch");
+            const categoryFilter = document.getElementById("categoryFilter");
+            const statusFilter = document.getElementById("statusFilter");
+            const productGrid = document.getElementById("productGrid");
+
+            function fetchProducts() {
+                const search = searchInput.value;
+                const category = categoryFilter.value;
+                const status = statusFilter.value;
+
+                const url = `?search=${search}&category=${category}&status=${status}`;
+
+                fetch(url, {
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    productGrid.innerHTML = data.html;
+                });
+            }
+
+            // 🔥 Live search
+            searchInput.addEventListener("keyup", fetchProducts);
+
+            // 🔥 Live category filter
+            categoryFilter.addEventListener("change", fetchProducts);
+
+            // 🔥 Live status filter
+            statusFilter.addEventListener("change", fetchProducts);
+        </script>
+
+    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Open modal
+            document.querySelectorAll('.inline-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.card');
+                    const modal = card.querySelector('.inline-delete-modal');
+                    modal.style.display = 'block';
+                });
+            });
+
+            // Cancel delete
+            document.querySelectorAll('.cancel-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.inline-delete-modal');
+                    modal.style.display = 'none';
+                });
+            });
+
+            // Optional: close modal if click outside modal box
+            document.querySelectorAll('.inline-delete-modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if(e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

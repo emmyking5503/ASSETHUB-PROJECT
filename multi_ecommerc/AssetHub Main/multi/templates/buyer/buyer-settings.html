@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Nexus Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/buyer.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <div class="mobile-overlay" id="mobileOverlay"></div>
+        
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="buyer-dashboard.html" class="brand">
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </div>
+                    <div class="brand-text">NEXUS<span>Market</span></div>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="buyer-dashboard.html" class="nav-link">
+                            <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="my-orders.html" class="nav-link">
+                            <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
+                            <span>My Orders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="wishlist.html" class="nav-link">
+                            <span class="nav-icon"><i class="fa-solid fa-heart"></i></span>
+                            <span>Wishlist</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="messages.html" class="nav-link">
+                            <span class="nav-icon"><i class="fa-solid fa-message"></i></span>
+                            <span>Messages</span>
+                            <span class="nav-badge">3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="wallet.html" class="nav-link">
+                            <span class="nav-icon"><i class="fa-solid fa-wallet"></i></span>
+                            <span>Wallet</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="address-book.html" class="nav-link">
+                            <span class="nav-icon"><i class="fa-solid fa-location-dot"></i></span>
+                            <span>Address Book</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="buyer-settings.html" class="nav-link active">
+                            <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="nav-link" style="color: var(--danger);">
+                    <span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Settings</h1>
+                </div>
+                
+                <div class="navbar-right">
+                    <a href="seller-dashboard.html" class="btn-my-shop">
+                        <i class="fa-solid fa-store"></i>
+                        <span>My Shop</span>
+                    </a>
+                    
+                    <button class="btn-notification" id="btnNotification">
+                        <i class="fa-regular fa-bell"></i>
+                        <div class="dropdown-menu" id="notificationDropdown">
+                            <div class="dropdown-header">
+                                <span class="dropdown-header-title">Notifications</span>
+                            </div>
+                            <ul class="dropdown-list">
+                                <li>
+                                    <a href="#" class="dropdown-item">
+                                        <i class="fa-solid fa-box"></i>
+                                        <span>Your order #1234 has been shipped</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <button class="btn-profile" id="btnProfile">
+                            <img src="https://i.pravatar.cc/150?img=5" alt="Profile" class="profile-avatar">
+                            <div class="profile-info">
+                                <div class="profile-name">Sarah Johnson</div>
+                                <div class="profile-role">Buyer</div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down profile-arrow"></i>
+                            <div class="dropdown-menu" id="profileDropdown">
+                                <ul class="dropdown-list">
+                                    <li>
+                                        <a href="buyer-settings.html" class="dropdown-item">
+                                            <i class="fa-solid fa-user"></i>
+                                            <span>My Profile</span>
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-divider"></li>
+                                    <li>
+                                        <a href="#" class="dropdown-item danger">
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                            <span>Logout</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="settings-container">
+                    
+                    <!-- Profile Settings -->
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">Profile Information</h3>
+                        
+                        <div class="avatar-upload">
+                            <img src="https://i.pravatar.cc/150?img=5" alt="Profile" class="avatar-preview">
+                            <div class="avatar-actions">
+                                <button class="btn btn-secondary btn-sm">Change Photo</button>
+                                <button class="btn btn-ghost btn-sm" style="color: var(--danger);">Remove</button>
+                            </div>
+                        </div>
+                        
+                        <form>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-input" value="Sarah">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-input" value="Johnson">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-input" value="sarah.johnson@email.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-input" value="+1 (555) 123-4567">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Bio</label>
+                                <textarea class="form-textarea" rows="3">Love shopping for tech gadgets and vintage items!</textarea>
+                                <p class="form-hint">Brief description for your profile.</p>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Change Password -->
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">Change Password</h3>
+                        
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-input" placeholder="Enter current password">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" class="form-input" placeholder="Enter new password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-input" placeholder="Confirm new password">
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    
+
+                    <!-- Account Security -->
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">Account Security</h3>
+                        <div style=" border-top: 1px solid var(--gray-100);">
+                            
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fa-solid fa-trash"></i> Delete Account
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {% comment %} <script src="js/buyer.js"></script> {% endcomment %}
+</body>
+</html>

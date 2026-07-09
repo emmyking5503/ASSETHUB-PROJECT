@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Seller Dashboard - Nexus Seller{% endblock %}</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" id="mobileOverlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="{% url 'seller_dashboard' %}" class="logo">
+                    <i class="fa-solid fa-store"></i>
+                    <div>Asset<span>Hub</span></div>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <a href="{% url 'seller_dashboard' %}" class="nav-link {% if request.path == '/seller/dashboard/' %}active{% endif %}">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{% url 'add_product' %}" class="nav-link {% if request.path == '/add-product/' %}active{% endif %}">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        <span>Add Product</span>
+                    </a>
+                    <a href="{% url 'my_products' %}" class="nav-link {% if request.path == '/my-products/' %}active{% endif %}">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>My Products</span>
+                    </a>
+                    <a href="{% url 'seller_order' %}" class="nav-link  {% if request.path == '/seller/order/' %}active{% endif %}">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Orders</span>
+                        <span class="nav-badge">3</span>
+                    </a>
+                    <a href="{% url 'escrow'%}" class="nav-link  {% if request.path == '/escrow/' %}active{% endif %}">
+                        <i class="fa-solid fa-handshake"></i>
+                        <span>Transaction</span>
+                    </a>
+                    <a href="{% url 'seller_customers'%}" class="nav-link  {% if request.path == '/seller/customers/' %}active{% endif %}">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Customers</span>
+                    </a>
+                    
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="{% url 'user_settings' %}" class="nav-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+                {% comment %} <a href="" class="nav-link" style="color: var(--danger);">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    
+                </a> {% endcomment %}
+                <form method="POST" action="{% url 'logout' %}" id="logoutForm">
+                    {% csrf_token %}
+                    <a href="#" onclick="document.getElementById('logoutForm').submit();" class="nav-link" style="color: var(--danger);">
+                       <i class="fa-solid fa-right-from-bracket"></i>
+                        Logout
+                    </a>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                </div>
+                
+                <div class="navbar-right">
+                    <a href="{% url 'buyer_dashboard' %}" class="btn-switch">
+                        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                        <span>Switch to Buyer</span>
+                    </a>
+                    
+                    <button class="nav-icon-btn" id="notifBtn">
+                        <i class="fa-regular fa-bell"></i>
+                        {% if dashboard_notifications_count > 0 %}
+                            <span class="notification-dot"></span>
+                        {% endif %}
+                        <div class="dropdown-menu" id="notifDropdown" style="width: 280px;">
+                            <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600;">
+                                Notifications
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                {% if dashboard_notifications %}
+                                    {% for item in dashboard_notifications %}
+                                        <a href="{% if item.url != '#' %}{{ item.url }}{% else %}#{% endif %}" class="dropdown-item" style="white-space: normal;">
+                                            <div>
+                                                <div style="font-weight: 500; margin-bottom: 0.25rem;">{{ item.title }}</div>
+                                                <div style="font-size: 0.75rem; color: var(--gray-400);">{{ item.description }}</div>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <div style="padding: 1rem; color: var(--gray-500);">No new notifications.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <button class="profile-btn" id="profileBtn">
+                            <div class="profile-info">
+                                <div class="profile-name">{{ request.user.get_full_name }}</div>
+                                <div class="profile-role">{% block profile_role %}Top Seller{% endblock %}</div>
+                            </div>
+                            <img src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Profile" class="profile-img">
+                            <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--gray-400);"></i>
+                        </button>
+                        <div class="dropdown-menu" id="profileDropdown">
+                            {% block profile_dropdown %}
+                            <a href="" class="dropdown-item">
+                                <i class="fa-solid fa-user"></i>
+                                <span>My Profile</span>
+                            </a>
+                            <a href="{% url 'home' %}" class="dropdown-item">
+                                <i class="fa-solid fa-home"></i>
+                                <span>Homepage</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <form method="POST" action="{% url 'logout' %}" id="logoutForm">
+                                {% csrf_token %}
+                                <a href="#" onclick="document.getElementById('logoutForm').submit();" class="nav-link" style="color: var(--danger);">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                    Logout
+                                </a>
+                            </form>
+                            {% endblock %}
+                        </div>
+                    </div>
+
+                </div>
+            </header>
+
+            <!-- Page Specific Content -->
+            <div class="page-content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

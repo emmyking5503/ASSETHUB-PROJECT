@@ -1,0 +1,128 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Markets - Super Admin{% endblock %}
+{% block markets_active %}active{% endblock %}
+
+{% block content %}
+<div class="market-overview full-view">
+    <div class="section-header">
+        <div>
+            <h2>All Sellers</h2>
+            <p>Complete overview of all marketplaces</p>
+        </div>
+        <button class="view-all-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add Market
+        </button>
+    </div>
+
+    <div class="markets-table-container">
+        <table class="markets-table">
+            <thead>
+                <tr>
+                    <th>Market</th>
+                    
+                    <th>Buyers</th>
+                    <th>Orders</th>
+                    <th>Revenue</th>
+                    <th>Growth</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+{% for item in seller_data %}
+{% with seller=item.seller %}
+<tr>
+    <td>
+        <div class="market-table-info">
+            <div class="market-table-icon">
+                {{ seller.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <span class="market-table-name">
+                    {{ seller.get_full_name|default:seller.username }}
+                </span>
+                <span class="market-table-id">
+                    SELLER-{{ seller.id|stringformat:"03d" }}
+                </span>
+            </div>
+        </div>
+    </td>
+
+    <!-- BUYERS -->
+    <td>{{ item.buyers_count }}</td>
+
+    <!-- ORDERS -->
+    <td>{{ item.orders_count }}</td>
+
+    <!-- REVENUE -->
+    <td>${{ item.revenue|floatformat:2 }}</td>
+
+    <!-- GROWTH (optional placeholder) -->
+    <td class="positive">+0%</td>
+
+    <!-- STATUS -->
+    <td>
+        {% if seller.is_active %}
+            <span class="status-dot" style="background-color:#00ff88;"></span>
+            Active
+        {% else %}
+            <span class="status-dot" style="background-color:#ff4444;"></span>
+            Inactive
+        {% endif %}
+    </td>
+
+    <td>
+    <div class="action-buttons">
+
+        <!-- TOGGLE ACTIVE -->
+<form method="POST" action="{% url 'toggle_user_status' seller.id %}">
+    {% csrf_token %}
+    <button class="action-btn warning" title="Toggle Status">
+        {% if seller.is_active %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="18" y1="8" x2="23" y2="13"/>
+                <line x1="23" y1="8" x2="18" y2="13"/>
+            </svg>
+        {% else %}
+            ✅
+        {% endif %}
+    </button>
+</form>
+
+<!-- DELETE -->
+<form method="POST" action="{% url 'delete_user' seller.id %}" 
+      onsubmit="return confirm('Are you sure you want to delete this user?');">
+    {% csrf_token %}
+    <button class="action-btn danger" title="Delete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+    </button>
+</form>
+
+    </div>
+</td>
+
+</tr>
+{% endwith %}
+{% empty %}
+<tr>
+    <td colspan="7">No sellers found</td>
+</tr>
+{% endfor %}
+</tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+

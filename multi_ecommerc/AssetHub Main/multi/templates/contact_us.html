@@ -1,0 +1,653 @@
+{% extends 'main_base.html' %}
+{% load static %}
+
+{% block title %}Assethub · Premium Multi-Vendor Marketplace{% endblock %}
+
+{% block extra_css %}
+
+    <style>
+      :root {
+        --bg: #f8fafd;
+        --surface: #ffffff;
+        --primary: #1b4a3b;
+        --primary-dark: #0e3a2e;
+        --primary-light: #2a6b58;
+        --accent: #2c8f6e;
+        --accent-light: #3fa582;
+        --accent-warm: #b95b2d;
+        --accent-success: #007a5c;
+        --text-main: #152b42;
+        --text-dark: #0d263b;
+        --text-muted: #4b6682;
+        --border-light: #e5ecf5;
+        --border-soft: #dae4f0;
+        --shadow-sm: 0 4px 12px rgba(10, 30, 50, 0.05);
+        --shadow-md: 0 12px 24px rgba(18, 52, 86, 0.08);
+        --shadow-lg: 0 24px 48px rgba(12, 40, 70, 0.12);
+        --radius-sm: 12px;
+        --radius-md: 16px;
+        --radius-lg: 24px;
+        --radius-pill: 40px;
+        --radius-full: 9999px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+        line-height: 1.5;
+        scroll-behavior: smooth;
+      }
+
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 32px;
+      }
+
+      /* navbar */
+      .navbar {
+        background: rgba(255,255,255,0.94);
+        backdrop-filter: blur(16px);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+      }
+      .nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 74px;
+      }
+      .logo {
+        font-weight: 800;
+        font-size: 1.7rem;
+        letter-spacing: -0.02em;
+        color: var(--primary);
+        text-decoration: none;
+      }
+      .logo span { color: var(--accent); }
+      .nav-links { display: flex; gap: 2rem; }
+      .nav-links a {
+        text-decoration: none;
+        color: #2c4a6e;
+        font-weight: 500;
+        transition: 0.2s;
+      }
+      .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+      .nav-actions { display: flex; gap: 12px; }
+      .btn-outline-sm {
+        background: transparent;
+        border: 1px solid #cfdfed;
+        padding: 8px 20px;
+        border-radius: 60px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: 0.2s;
+        cursor: pointer;
+      }
+      .btn-primary-sm {
+        background: var(--primary);
+        border: none;
+        color: white;
+        padding: 8px 22px;
+        border-radius: 60px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: 0.2s;
+        cursor: pointer;
+      }
+      .btn-primary-sm:hover { background: var(--accent); transform: translateY(-2px);}
+      .mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
+
+      /* hero contact */
+      .contact-hero {
+        margin-top: 98px;
+        background: linear-gradient(120deg, #f0f6fe 0%, #ffffff 100%);
+        padding: 3.5rem 0 2.5rem;
+        border-bottom: 1px solid var(--border-soft);
+      }
+      .hero-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        background: linear-gradient(130deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      /* main contact grid */
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        margin: 56px 0 80px;
+      }
+      /* info cards */
+      .info-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 32px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0,0,0,0.04);
+        transition: all 0.2s;
+        height: fit-content;
+      }
+      .contact-detail-block {
+        margin-bottom: 36px;
+      }
+      .contact-icon {
+        width: 52px;
+        height: 52px;
+        background: #eef3fc;
+        border-radius: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        color: var(--accent);
+        margin-bottom: 20px;
+      }
+      .contact-detail-block h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--primary-dark);
+      }
+      .contact-detail-block p, .contact-detail-block a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 1rem;
+        line-height: 1.5;
+        display: block;
+        margin-bottom: 6px;
+      }
+      .contact-detail-block a:hover { color: var(--accent); }
+      .business-hours {
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-soft);
+      }
+      .business-hours span { font-weight: 600; color: var(--primary); }
+
+      /* Enhanced Map Wrapper - Modern & Interactive */
+      .map-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-top: 32px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .map-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.15);
+      }
+      .map-header {
+        padding: 16px 24px;
+        background: white;
+        border-bottom: 1px solid var(--border-soft);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .map-header h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .map-header h4 i {
+        color: var(--accent);
+        font-size: 1.1rem;
+      }
+      .location-badge {
+        background: #eef3fc;
+        padding: 6px 14px;
+        border-radius: 40px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--accent);
+      }
+      .map-wrapper {
+        width: 100%;
+        height: 340px;
+        background: #e9eff5;
+        position: relative;
+      }
+      .map-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+      }
+      .map-footer {
+        padding: 12px 24px;
+        background: #fafcff;
+        border-top: 1px solid var(--border-soft);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .map-footer i {
+        color: var(--accent);
+      }
+
+      /* Django-ready form - no JS submission, pure HTML/CSS */
+      .contact-form {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 32px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0,0,0,0.04);
+      }
+      .form-group {
+        margin-bottom: 24px;
+      }
+      .form-group label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--primary-dark);
+        font-size: 0.9rem;
+      }
+      .form-group label .required {
+        color: var(--accent-warm);
+        margin-left: 4px;
+      }
+      .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 14px 18px;
+        border: 1.5px solid #e2edf7;
+        border-radius: 20px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        transition: 0.2s;
+        background: white;
+      }
+      .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(44,143,110,0.15);
+      }
+      .submit-btn {
+        background: var(--primary);
+        border: none;
+        padding: 14px 28px;
+        border-radius: 40px;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.25s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        justify-content: center;
+      }
+      .submit-btn:hover {
+        background: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px -10px rgba(27,74,59,0.3);
+      }
+      .form-note {
+        font-size: 0.75rem;
+        margin-top: 20px;
+        color: #8598aa;
+        text-align: center;
+        border-top: 1px solid #eef3fc;
+        padding-top: 20px;
+      }
+
+      /* faq section */
+      .faq-section {
+        background: white;
+        padding: 64px 0;
+        border-top: 1px solid var(--border-soft);
+      }
+      .faq-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 32px;
+        margin-top: 48px;
+      }
+      .faq-item {
+        border-bottom: 1px solid #ecf3f9;
+        padding: 20px 0;
+      }
+      .faq-question {
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+        color: #1f3a4c;
+        user-select: none;
+      }
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+        color: var(--text-muted);
+        margin-top: 8px;
+        line-height: 1.5;
+      }
+      .faq-item.open .faq-answer { max-height: 180px; }
+
+      /* footer */
+      .footer {
+        background: var(--primary-dark);
+        color: white;
+        padding: 56px 0 32px;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 48px;
+      }
+      .footer-col .logo { color: white; display: inline-block; margin-bottom: 16px; }
+      .footer-col p { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+      .social-links a {
+        background: rgba(255,255,255,0.12);
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 10px;
+        color: white;
+        transition: 0.2s;
+      }
+      .social-links a:hover {
+        background: var(--accent);
+        transform: translateY(-3px);
+      }
+      .footer-col a { color: rgba(255,255,255,0.7); text-decoration: none; display: block; margin: 10px 0; font-size: 0.9rem; }
+      .footer-col a:hover { color: white; }
+      .footer-bottom { text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 28px; font-size: 0.8rem; }
+
+      /* Toast Notification */
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--primary);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 3000;
+        font-weight: 500;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      @media (max-width: 880px) {
+        .contact-grid { grid-template-columns: 1fr; gap: 32px; }
+        .faq-grid { grid-template-columns: 1fr; }
+        .nav-links, .nav-actions { display: none; }
+        .mobile-toggle { display: block; }
+        .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+        .container { padding: 0 24px; }
+        .hero-title { font-size: 2.2rem; }
+      }
+      @media (max-width: 560px) {
+        .footer-grid { grid-template-columns: 1fr; }
+        .hero-title { font-size: 1.8rem; }
+        .map-wrapper { height: 260px; }
+      }
+      [data-aos] {
+        pointer-events: auto;
+      }
+    </style>
+ {% endblock %}
+
+{% block content %}
+  <main>
+    <!-- Hero contact -->
+    <section class="contact-hero">
+      <div class="container" data-aos="fade-up">
+        <div style="max-width: 700px;">
+          <span style="background:#eef2fa; padding:6px 14px; border-radius:40px; font-size:0.8rem; font-weight:600; color:var(--accent); display:inline-block; margin-bottom:1rem;"><i class="fas fa-headset"></i> 24/7 priority support</span>
+          <h1 class="hero-title">Let’s connect —<br> we’re here to help</h1>
+          <p style="color: #4a627a; font-size: 1.1rem; max-width: 550px; margin-top: 1rem;">Whether you're a buyer, seller, or partner, our dedicated team responds within hours. Secure asset escrow marketplace backed by real humans.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="contact-grid">
+        <!-- LEFT: Info + Enhanced Map -->
+        <div>
+          Block D, Triq Giorgio Mitrovich, Pembroke PBK 1014
+          <div class="info-card" data-aos="fade-right">
+            <div class="contact-detail-block">
+              <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+              <h3>Global headquarters</h3>
+              <p>Block D, Triq Giorgio Mitrovich,<br>Pembroke PBK 1014 · Malta</p>
+              <p><i class="fas fa-building" style="margin-right: 8px; opacity: 0.7;"></i> EU Hub: Malta,  Malta</p>
+            </div>
+            <div class="contact-detail-block">
+              <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+              <h3>Email & support</h3>
+              <a href="mailto:hello@assethub.com">chukwudegoodnesschukwemeka@gmail.com</a>
+              <a href="mailto:escrow@assethub.com">chukwudegoodnesschukwemeka@gmail.com </a>
+            </div>
+            <div class="contact-detail-block">
+              <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+              <h3>Phone concierge</h3>
+              <p>+1 (415) 800-4321</p>
+              <p>+44 20 3984 2323 (EMEA)</p>
+            </div>
+            <div class="business-hours">
+              <i class="fas fa-clock" style="margin-right: 8px; color: var(--accent);"></i> <span>Business hours</span><br>
+              Mon–Fri: 8:00 AM – 7:00 PM PST · Weekend: 10 AM – 4 PM PST
+            </div>
+          </div>
+
+        
+
+          
+        </div>
+          
+        <!-- RIGHT: Django-Ready Contact Form (no JS submission) -->
+        <div data-aos="fade-left">
+          <div class="contact-form">
+            <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 8px;">Send a message</h2>
+            <p style="color: var(--text-muted); margin-bottom: 28px;">All messages are reviewed by our specialist team. We'll get back to you within 4 hours.</p>
+            
+            <!-- Django Form: action will be set to your backend URL, method POST, CSRF token included -->
+            <form method="POST" action="{% url 'contact' %}" id="contactFormDjango">
+              <!-- CSRF token placeholder - Django will replace this with {% csrf_token %} -->
+              {% csrf_token %}
+              
+              <div class="form-group">
+                <label>Full name <span class="required">*</span></label>
+                <input type="text" name="full_name" id="fullname" placeholder="Alex Morgan" required>
+              </div>
+              <div class="form-group">
+                <label>Email address <span class="required">*</span></label>
+                <input type="email" name="email" id="email" placeholder="hello@domain.com" required>
+              </div>
+              <div class="form-group">
+                <label>I am a <span class="required">*</span></label>
+                <select name="user_type" id="userType" required>
+                  <option value="buyer">Buyer</option>
+                  <option value="seller">Seller / Vendor</option>
+                  <option value="partner">Partner / Enterprise</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Subject</label>
+                <input type="text" name="subject" id="subject" placeholder="Escrow question / account support / asset inquiry">
+              </div>
+              <div class="form-group">
+                <label>Message <span class="required">*</span></label>
+                <textarea rows="5" name="message" id="message" placeholder="Describe your inquiry or concern. We protect your privacy and assets." required></textarea>
+              </div>
+              <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send message</button>
+              
+            </form>
+          </div>
+        </div>
+        
+      </div>
+        <!-- Enhanced Map Section - Modern & Interactive -->
+          <div class="map-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="map-header">
+              <h4><i class="fas fa-location-dot"></i> Main office — Malta</h4>
+              <span class="location-badge"><i class="fas fa-globe-americas"></i> Global hub</span>
+            </div>
+            <div class="map-wrapper">
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3230.8596636171756!2d14.473573676388282!3d35.925934916491975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x130e4561435a0f4b%3A0x3c0bed8e64806d6f!2sSTC%20Higher%20Education!5e0!3m2!1sen!2smt!4v1783577101458!5m2!1sen!2smt" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+            <div class="map-footer">
+              <i class="fas fa-subway"></i> <span>Pembroke Park and Ride — 2 min walk</span>
+              <i class="fas fa-building" style="margin-left: auto;"></i> <span>Block D, University of Malta</span>
+            </div>
+          </div>
+    </div>
+
+    <!-- FAQ Section -->
+   <section class="faq-section">
+  <div class="container">
+    <div style="text-align: center;" data-aos="fade-up">
+      <span style="background:#eef2fa; padding:6px 14px; border-radius:40px; font-size:0.8rem; font-weight:600; color:var(--accent);">FAQs</span>
+      <h2 style="font-size: 2.1rem; margin: 16px 0 8px;">Frequently Asked Questions</h2>
+      <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+        Learn more about how AssetHub's marketplace, escrow system, and dispute process work.
+      </p>
+    </div>
+
+    <div class="faq-grid">
+
+      <div class="faq-item" data-aos="fade-up">
+        <div class="faq-question">What is AssetHub? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-answer">
+          AssetHub is a peer-to-peer marketplace prototype that allows users to buy and sell items securely using an escrow-based transaction system.
+        </div>
+      </div>
+
+      <div class="faq-item" data-aos="fade-up">
+        <div class="faq-question">How does the escrow system work? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-answer">
+          The buyer's payment is held until the seller delivers the item and the buyer confirms that it meets the agreed conditions. This helps increase trust between both parties.
+        </div>
+      </div>
+
+      <div class="faq-item" data-aos="fade-up">
+        <div class="faq-question">Can buyers and sellers trade without using escrow? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-answer">
+          Yes. AssetHub also supports direct transactions, allowing buyers and sellers to communicate and complete transactions outside the escrow process if they choose.
+        </div>
+      </div>
+
+      <div class="faq-item" data-aos="fade-up">
+        <div class="faq-question">What happens if there is a disagreement? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-answer">
+          Buyers can open a dispute, provide supporting evidence, and the administrator can review the case before deciding whether the payment should be released to the seller or refunded to the buyer.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+    <!-- CTA banner subtle -->
+    <div class="container" style="margin-bottom: 70px;">
+      <div style="background: linear-gradient(105deg, var(--primary-dark) 0%, var(--primary) 100%); border-radius: 28px; padding: 48px 40px; text-align: center; color: white;" data-aos="zoom-in">
+        <h3 style="font-size: 1.8rem;">Need urgent escrow assistance?</h3>
+        <p style="margin: 12px 0 24px; opacity: 0.85;">Our dispute resolution team is available 24/6 for high-value asset transactions.</p>
+        <a href="/live-chat" class="btn-primary-sm" style="background: white; color: var(--primary); font-weight: 700; padding: 12px 32px; text-decoration: none; display: inline-block;">Start Now By Logging In</a>
+      </div>
+    </div>
+  </main>
+
+ {% block extra_js %}
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 700, once: true, offset: 20 });
+    
+    // FAQ toggle
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+      const questionDiv = item.querySelector('.faq-question');
+      if (questionDiv) {
+        questionDiv.addEventListener('click', () => {
+          const isOpen = item.classList.contains('open');
+          faqItems.forEach(i => i.classList.remove('open'));
+          if (!isOpen) item.classList.add('open');
+        });
+      }
+    });
+    if(faqItems.length) faqItems[0].classList.add('open');
+
+    // Toast helper
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toastEl');
+      const textSpan = document.getElementById('toastText');
+      textSpan.innerHTML = message;
+      toast.classList.add('show');
+      if(isError) toast.style.background = "#b13e3e";
+      else toast.style.background = "var(--primary)";
+      setTimeout(() => {
+        toast.classList.remove('show');
+        toast.style.background = "var(--primary)";
+      }, 3000);
+    }
+
+    // Form submit simulation (just for demo, Django will handle actual submission)
+    const contactForm = document.getElementById('contactFormDjango');
+    if (contactForm) {
+      contactForm.addEventListener('submit', (e) => {
+        // Don't prevent default - let Django handle it
+        // This is just to show toast for demo purposes
+        const name = document.getElementById('fullname')?.value.trim();
+        if (name && document.getElementById('email')?.value.trim() && document.getElementById('message')?.value.trim()) {
+          showToast(`✓ Thanks ${name}, we'll reply within 4 hours.`);
+        }
+      });
+    }
+
+    // mobile menu
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => {
+        alert('Navigation menu — full links available. Visit our marketplace or contact page.');
+      });
+    }
+  </script>
+  </body>
+  </html>
+{% endblock %}
+{% endblock %}

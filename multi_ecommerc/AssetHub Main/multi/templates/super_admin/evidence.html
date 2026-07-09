@@ -1,0 +1,1104 @@
+{% extends 'super_admin/admin_base.html' %}
+ {% load custom_filters %}
+{% load static %}
+    <title>Evidence Center - AssetHub Admin</title>
+{% block extra_css %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0c0c0c;
+            --bg-sidebar: #111111;
+            --bg-card: #1a1a1a;
+            --bg-card-hover: #222222;
+            --bg-input: #1e1e1e;
+            --bg-badge: #252525;
+            --border-color: #2a2a2a;
+            --border-light: #333333;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent-red: #dc2626;
+            --accent-red-hover: #b91c1c;
+            --accent-red-light: rgba(220, 38, 38, 0.15);
+            --accent-green: #22c55e;
+            --accent-green-light: rgba(34, 197, 94, 0.15);
+            --accent-blue: #3b82f6;
+            --accent-blue-light: rgba(59, 130, 246, 0.15);
+            --accent-orange: #f59e0b;
+            --accent-orange-light: rgba(245, 158, 11, 0.15);
+            --accent-purple: #8b5cf6;
+            --accent-purple-light: rgba(139, 92, 246, 0.15);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-light: rgba(6, 182, 212, 0.15);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-brand {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-red);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        .sidebar-brand-text {
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .nav-item.active {
+            background: var(--accent-red);
+            color: white;
+        }
+        .nav-item i {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--accent-red);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red-light);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .search-box {
+            position: relative;
+            width: 380px;
+        }
+        .search-box input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 10px 16px 10px 42px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .search-box input:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .topbar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .topbar-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        .topbar-btn .badge-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px 6px 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .user-profile:hover {
+            border-color: var(--border-light);
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .user-info { line-height: 1.2; }
+        .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .user-role { font-size: 11px; color: var(--text-muted); }
+
+        /* ===== PAGE CONTENT ===== */
+        .page-content {
+            padding: 28px;
+            flex: 1;
+        }
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .breadcrumb-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+        .breadcrumb-nav a:hover { color: var(--text-secondary); }
+        .breadcrumb-nav .active { color: var(--text-secondary); font-size: 13px; }
+        .breadcrumb-nav i { color: var(--text-muted); font-size: 10px; }
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        /* ===== TABS ===== */
+        .evidence-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0;
+        }
+        .evidence-tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .evidence-tab:hover {
+            color: var(--text-secondary);
+        }
+        .evidence-tab.active {
+            color: var(--accent-red);
+            border-bottom-color: var(--accent-red);
+        }
+        .evidence-tab .tab-count {
+            background: var(--bg-badge);
+            color: var(--text-secondary);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .evidence-tab.active .tab-count {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        /* ===== TOOLBAR ===== */
+        .evidence-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .toolbar-search {
+            position: relative;
+            width: 280px;
+        }
+        .toolbar-search input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 9px 14px 9px 38px;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .toolbar-search input:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        .toolbar-search input::placeholder { color: var(--text-muted); }
+        .toolbar-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .toolbar-filter {
+            padding: 9px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .toolbar-filter:hover {
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        .view-toggle {
+            display: flex;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .view-toggle button {
+            padding: 8px 14px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .view-toggle button.active {
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+        .view-toggle button:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        /* ===== EVIDENCE GRID ===== */
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 1400px) { .evidence-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 992px) { .evidence-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 576px) { .evidence-grid { grid-template-columns: 1fr; } }
+
+        .evidence-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .evidence-card:hover {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+            transform: translateY(-2px);
+        }
+        .evidence-preview {
+            height: 160px;
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+        }
+        .evidence-preview.image { background: var(--accent-purple-light); }
+        .evidence-preview.video { background: var(--accent-red-light); }
+        .evidence-preview.pdf { background: var(--accent-orange-light); }
+        .evidence-preview.doc { background: var(--accent-blue-light); }
+        .evidence-preview i { font-size: 36px; }
+        .evidence-preview.image i { color: var(--accent-purple); }
+        .evidence-preview.video i { color: var(--accent-red); }
+        .evidence-preview.pdf i { color: var(--accent-orange); }
+        .evidence-preview.doc i { color: var(--accent-blue); }
+        .evidence-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .evidence-card:hover .evidence-overlay { opacity: 1; }
+        .evidence-overlay-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            color: var(--bg-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        .evidence-overlay-btn:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+        .evidence-body {
+            padding: 14px 16px;
+        }
+        .evidence-filename {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 10px;
+        }
+        .evidence-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .evidence-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+        .evidence-meta-label {
+            color: var(--text-muted);
+        }
+        .evidence-meta-value {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .evidence-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .evidence-badge.verified { background: var(--accent-green-light); color: var(--accent-green); }
+        .evidence-badge.pending { background: var(--accent-orange-light); color: var(--accent-orange); }
+
+        /* ===== LIST VIEW ===== */
+        .list-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .list-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .list-table thead th {
+            background: var(--bg-sidebar);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+        .list-table tbody td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+        .list-table tbody tr {
+            transition: background 0.15s ease;
+        }
+        .list-table tbody tr:hover {
+            background: var(--bg-card-hover);
+        }
+        .list-table tbody tr:last-child td { border-bottom: none; }
+        .file-icon-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .file-icon-sm.image { background: var(--accent-purple-light); color: var(--accent-purple); }
+        .file-icon-sm.video { background: var(--accent-red-light); color: var(--accent-red); }
+        .file-icon-sm.pdf { background: var(--accent-orange-light); color: var(--accent-orange); }
+        .file-icon-sm.doc { background: var(--accent-blue-light); color: var(--accent-blue); }
+
+        /* ===== PAGINATION ===== */
+        .pagination-custom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .pagination-info {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .page-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--border-light);
+        }
+        .page-btn.active {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ===== SECTION HEADER ===== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title i { color: var(--accent-red); font-size: 18px; }
+        .section-count {
+            background: var(--bg-badge);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ===== MOBILE ===== */
+        .mobile-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: flex; }
+            .search-box { width: 100%; max-width: 300px; }
+        }
+        @media (max-width: 768px) {
+            .topbar { padding: 12px 16px; }
+            .page-content { padding: 16px; }
+            .search-box { max-width: 200px; }
+            .evidence-tabs { overflow-x: auto; }
+            .evidence-tab { white-space: nowrap; }
+        }
+        @media (max-width: 576px) {
+            .search-box { display: none; }
+            .evidence-toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-left { width: 100%; }
+            .toolbar-search { width: 100%; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+{% endblock extra_css %}
+
+   
+
+   
+
+
+
+{% block content %}
+<div class="page-content">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+        <a href="{% url 'super_admin' %}">Dashboard</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'admin_disputes_list' %}">Disputes</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'admin_dispute_detail' dispute.id %}">#{{ dispute.dispute_id }}</a>
+        <i class="bi bi-chevron-right"></i>
+        <span class="active">Evidence Center</span>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <h1 class="page-title mb-0">Evidence Center</h1>
+        <div class="d-flex gap-2">
+            <a href="{% url 'admin_dispute_detail' dispute.id %}" class="action-btn-lg" style="padding:8px 16px;font-size:13px;">
+                <i class="bi bi-arrow-left"></i> Back to Case
+            </a>
+            <a href="{% url 'admin_decision_center' dispute.id %}" class="action-btn-lg" style="padding:8px 16px;font-size:13px;background:var(--accent-red);border-color:var(--accent-red);color:white;">
+                <i class="bi bi-gavel"></i> Decision Center
+            </a>
+        </div>
+    </div>
+
+    <!-- Evidence Tabs -->
+    <div class="evidence-tabs">
+        <button class="evidence-tab active" onclick="switchTab(this, 'buyer')">
+            <i class="bi bi-person"></i> Buyer Evidence <span class="tab-count">{{ buyer_count }}</span>
+        </button>
+        <button class="evidence-tab" onclick="switchTab(this, 'seller')">
+            <i class="bi bi-shop"></i> Seller Evidence <span class="tab-count">{{ seller_count }}</span>
+        </button>
+        <button class="evidence-tab" onclick="switchTab(this, 'system')">
+            <i class="bi bi-gear"></i> System Documents <span class="tab-count">{{ system_count }}</span>
+        </button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="evidence-toolbar">
+        <div class="toolbar-left">
+            <div class="toolbar-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="evidenceSearch" placeholder="Search files by name, type..." onkeyup="filterEvidence()">
+            </div>
+            <button class="toolbar-filter" onclick="document.getElementById('requestEvidenceModal').style.display='flex'">
+                <i class="bi bi-plus-circle"></i> Request Evidence
+            </button>
+        </div>
+        <div class="view-toggle">
+            <button class="active" onclick="switchView(this, 'grid')" title="Grid View"><i class="bi bi-grid"></i></button>
+            <button onclick="switchView(this, 'list')" title="List View"><i class="bi bi-list-ul"></i></button>
+        </div>
+    </div>
+
+    <!-- ===== BUYER EVIDENCE SECTION ===== -->
+    <div id="buyer-section">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-person"></i> Buyer Evidence</div>
+            <span class="section-count">{{ buyer_count }} file{{ buyer_count|pluralize }}</span>
+        </div>
+
+        {% if buyer_evidence %}
+        <!-- Grid View -->
+        <div class="evidence-grid" id="buyer-grid">
+            {% for evidence in buyer_evidence %}
+            <div class="evidence-card" data-filename="{{ evidence.file_name|lower }}">
+                <div class="evidence-preview {% if evidence.file_type == 'image' %}image{% elif evidence.file_type == 'video' %}video{% elif evidence.file_type == 'pdf' %}pdf{% else %}doc{% endif %}">
+                    {% if evidence.file_type == 'image' %}
+                        <i class="bi bi-image"></i>
+                    {% elif evidence.file_type == 'video' %}
+                        <i class="bi bi-camera-video"></i>
+                    {% elif evidence.file_type == 'pdf' %}
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    {% else %}
+                        <i class="bi bi-file-earmark-text"></i>
+                    {% endif %}
+                    <div class="evidence-overlay">
+                        <a href="{{ evidence.file.url }}" target="_blank" class="evidence-overlay-btn"><i class="bi bi-eye"></i></a>
+                        <a href="{{ evidence.file.url }}" download class="evidence-overlay-btn"><i class="bi bi-download"></i></a>
+                    </div>
+                </div>
+                <div class="evidence-body">
+                    <div class="evidence-filename">{{ evidence.file_name }}</div>
+                    <div class="evidence-meta">
+                        <div class="evidence-meta-row">
+                            <span class="evidence-meta-label">Type</span>
+                            <span class="evidence-meta-value">{{ evidence.get_file_type_display }}</span>
+                        </div>
+                        <div class="evidence-meta-row">
+                            <span class="evidence-meta-label">Uploaded By</span>
+                            <span class="evidence-meta-value">{{ buyer.username }}</span>
+                        </div>
+                        <div class="evidence-meta-row">
+                            <span class="evidence-meta-label">Date</span>
+                            <span class="evidence-meta-value">{{ evidence.uploaded_at|date:"M j, Y" }}</span>
+                        </div>
+                        <div class="evidence-meta-row">
+                            <span class="evidence-meta-label">Size</span>
+                            <span class="evidence-meta-value">
+                                {% if evidence.file_size < 1024 %}
+                                    {{ evidence.file_size }} B
+                                {% elif evidence.file_size < 1048576 %}
+                                    {{ evidence.file_size|div:1024|floatformat:1 }} KB
+                                {% else %}
+                                    {{ evidence.file_size|div:1048576|floatformat:1 }} MB
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="evidence-meta-row">
+                            <span class="evidence-meta-label">Status</span>
+                            <span class="evidence-badge verified"><i class="bi bi-check-circle" style="font-size:9px;"></i> Verified</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- List View (hidden by default) -->
+        <div class="list-card" id="buyer-list" style="display:none;">
+            <div class="table-responsive">
+                <table class="list-table">
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Type</th>
+                            <th>Uploaded By</th>
+                            <th>Date</th>
+                            <th>Size</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for evidence in buyer_evidence %}
+                        <tr>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <div class="file-icon-sm {% if evidence.file_type == 'image' %}image{% elif evidence.file_type == 'video' %}video{% elif evidence.file_type == 'pdf' %}pdf{% else %}doc{% endif %}">
+                                        {% if evidence.file_type == 'image' %}
+                                            <i class="bi bi-image"></i>
+                                        {% elif evidence.file_type == 'video' %}
+                                            <i class="bi bi-camera-video"></i>
+                                        {% elif evidence.file_type == 'pdf' %}
+                                            <i class="bi bi-file-earmark-pdf"></i>
+                                        {% else %}
+                                            <i class="bi bi-file-earmark-text"></i>
+                                        {% endif %}
+                                    </div>
+                                    <span style="font-weight:500;">{{ evidence.file_name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ evidence.get_file_type_display }}</td>
+                            <td>{{ buyer.username }}</td>
+                            <td>{{ evidence.uploaded_at|date:"M j, Y" }}</td>
+                            <td>
+                                {% if evidence.file_size < 1024 %}
+                                    {{ evidence.file_size }} B
+                                {% elif evidence.file_size < 1048576 %}
+                                    {{ evidence.file_size|div:1024|floatformat:1 }} KB
+                                {% else %}
+                                    {{ evidence.file_size|div:1048576|floatformat:1 }} MB
+                                {% endif %}
+                            </td>
+                            <td><span class="evidence-badge verified"><i class="bi bi-check-circle" style="font-size:9px;"></i> Verified</span></td>
+                            <td>
+                                <div style="display:flex;gap:6px;">
+                                    <a href="{{ evidence.file.url }}" target="_blank" class="action-btn" title="Preview"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ evidence.file.url }}" download class="action-btn" title="Download"><i class="bi bi-download"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">No buyer evidence uploaded yet.</div>
+        {% endif %}
+    </div>
+
+    <!-- ===== SELLER EVIDENCE SECTION ===== -->
+    <div id="seller-section" style="display:none;">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-shop"></i> Seller Evidence</div>
+            <span class="section-count">{{ seller_count }} file{{ seller_count|pluralize }}</span>
+        </div>
+
+        {% if seller_evidence %}
+        <div class="evidence-grid">
+            {% for evidence in seller_evidence %}
+            <div class="evidence-card" data-filename="{{ evidence.file_name|lower }}">
+                <div class="evidence-preview {% if evidence.file_type == 'image' %}image{% elif evidence.file_type == 'video' %}video{% elif evidence.file_type == 'pdf' %}pdf{% else %}doc{% endif %}">
+                    {% if evidence.file_type == 'image' %}
+                        <i class="bi bi-image"></i>
+                    {% elif evidence.file_type == 'video' %}
+                        <i class="bi bi-camera-video"></i>
+                    {% elif evidence.file_type == 'pdf' %}
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    {% else %}
+                        <i class="bi bi-file-earmark-text"></i>
+                    {% endif %}
+                    <div class="evidence-overlay">
+                        <a href="{{ evidence.file.url }}" target="_blank" class="evidence-overlay-btn"><i class="bi bi-eye"></i></a>
+                        <a href="{{ evidence.file.url }}" download class="evidence-overlay-btn"><i class="bi bi-download"></i></a>
+                    </div>
+                </div>
+                <div class="evidence-body">
+                    <div class="evidence-filename">{{ evidence.file_name }}</div>
+                    <div class="evidence-meta">
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Type</span><span class="evidence-meta-value">{{ evidence.get_file_type_display }}</span></div>
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Uploaded By</span><span class="evidence-meta-value">{{ seller.username }}</span></div>
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Date</span><span class="evidence-meta-value">{{ evidence.uploaded_at|date:"M j, Y" }}</span></div>
+                        <div class="evidence-meta-row">
+                            <span class="evidence-meta-label">Size</span>
+                            <span class="evidence-meta-value">
+                                {% if evidence.file_size < 1024 %}
+                                    {{ evidence.file_size }} B
+                                {% elif evidence.file_size < 1048576 %}
+                                    {{ evidence.file_size|div:1024|floatformat:1 }} KB
+                                {% else %}
+                                    {{ evidence.file_size|div:1048576|floatformat:1 }} MB
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Status</span><span class="evidence-badge verified"><i class="bi bi-check-circle" style="font-size:9px;"></i> Verified</span></div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">No seller evidence uploaded yet.</div>
+        {% endif %}
+    </div>
+
+    <!-- ===== SYSTEM DOCUMENTS SECTION ===== -->
+    <div id="system-section" style="display:none;">
+        <div class="section-header">
+            <div class="section-title"><i class="bi bi-gear"></i> System Documents</div>
+            <span class="section-count">{{ system_count }} document{{ system_count|pluralize }}</span>
+        </div>
+
+        {% if system_messages %}
+        <div class="evidence-grid">
+            {% for msg in system_messages %}
+            <div class="evidence-card">
+                <div class="evidence-preview doc">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="evidence-body">
+                    <div class="evidence-filename">Admin Message #{{ msg.id }}</div>
+                    <div class="evidence-meta">
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Type</span><span class="evidence-meta-value">System Log</span></div>
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Generated By</span><span class="evidence-meta-value">{{ msg.sender_user.username }}</span></div>
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Date</span><span class="evidence-meta-value">{{ msg.created_at|date:"M j, Y" }}</span></div>
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Message</span><span class="evidence-meta-value" style="font-size:11px;">{{ msg.message|truncatechars:50 }}</span></div>
+                        <div class="evidence-meta-row"><span class="evidence-meta-label">Status</span><span class="evidence-badge verified"><i class="bi bi-check-circle" style="font-size:9px;"></i> Auto-Generated</span></div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">No system documents available.</div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="list-card mt-4">
+        <div class="pagination-custom">
+            <div class="pagination-info">Total Evidence: {{ total_evidence }} files</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== REQUEST EVIDENCE MODAL ===== -->
+<div id="requestEvidenceModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;">
+        <div style="padding:24px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;">
+            <h5 style="margin:0;font-weight:600;"><i class="bi bi-plus-circle"></i> Request Additional Evidence</h5>
+            <button onclick="document.getElementById('requestEvidenceModal').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;">&times;</button>
+        </div>
+        <form method="post" action="{% url 'admin_request_evidence' dispute.id %}" style="padding:24px;">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Request From</label>
+                <div class="d-flex gap-3">
+                    <label style="flex:1;padding:12px;border:2px solid #e5e7eb;border-radius:8px;cursor:pointer;text-align:center;transition:all 0.2s;" 
+                           onmouseover="this.style.borderColor='#3b82f6'" onmouseout="if(!document.getElementById('party_buyer').checked)this.style.borderColor='#e5e7eb'"
+                           onclick="document.getElementById('party_buyer').checked=true;this.style.borderColor='#3b82f6';this.style.background='#eff6ff';document.getElementById('seller_label').style.borderColor='#e5e7eb';document.getElementById('seller_label').style.background='#fff';">
+                        <input type="radio" name="party" id="party_buyer" value="buyer" style="margin-bottom:8px;" checked>
+                        <div style="font-weight:600;">Buyer</div>
+                        <div style="font-size:12px;color:#6b7280;">{{ buyer.username }}</div>
+                    </label>
+                    <label id="seller_label" style="flex:1;padding:12px;border:2px solid #e5e7eb;border-radius:8px;cursor:pointer;text-align:center;transition:all 0.2s;background:#fff;"
+                           onmouseover="this.style.borderColor='#22c55e'" onmouseout="if(!document.getElementById('party_seller').checked)this.style.borderColor='#e5e7eb'"
+                           onclick="document.getElementById('party_seller').checked=true;this.style.borderColor='#22c55e';this.style.background='#f0fdf4';this.previousElementSibling.style.borderColor='#e5e7eb';this.previousElementSibling.style.background='#fff';">
+                        <input type="radio" name="party" id="party_seller" value="seller" style="margin-bottom:8px;">
+                        <div style="font-weight:600;">Seller</div>
+                        <div style="font-size:12px;color:#6b7280;">{{ seller.username }}</div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Evidence Type (Optional)</label>
+                <select name="evidence_type" class="form-select">
+                    <option value="">-- Select type --</option>
+                    <option value="Photo of Product">Photo of Product</option>
+                    <option value="Video Evidence">Video Evidence</option>
+                    <option value="Shipping Receipt">Shipping Receipt</option>
+                    <option value="Serial Number Proof">Serial Number Proof</option>
+                    <option value="Packaging Photo">Packaging Photo</option>
+                    <option value="Other Document">Other Document</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Message to Party</label>
+                <textarea name="message" class="form-control" rows="4" placeholder="Describe what evidence you need and why..." required></textarea>
+                <div class="form-text">This message will be sent via email and in-app notification.</div>
+            </div>
+            
+            <div class="alert alert-warning" style="font-size:13px;">
+                <i class="bi bi-clock"></i> The party will have <strong>3 days</strong> to submit the requested evidence.
+            </div>
+            
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('requestEvidenceModal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Send Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function switchTab(btn, section) {
+    document.querySelectorAll('.evidence-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    
+    document.getElementById('buyer-section').style.display = 'none';
+    document.getElementById('seller-section').style.display = 'none';
+    document.getElementById('system-section').style.display = 'none';
+    
+    document.getElementById(section + '-section').style.display = 'block';
+}
+
+function switchView(btn, view) {
+    document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    const sections = ['buyer', 'seller'];
+    sections.forEach(s => {
+        const grid = document.getElementById(s + '-grid');
+        const list = document.getElementById(s + '-list');
+        if (grid) grid.style.display = view === 'grid' ? 'grid' : 'none';
+        if (list) list.style.display = view === 'list' ? 'block' : 'none';
+    });
+}
+
+function filterEvidence() {
+    const query = document.getElementById('evidenceSearch').value.toLowerCase();
+    document.querySelectorAll('.evidence-card').forEach(card => {
+        const filename = card.getAttribute('data-filename') || '';
+        card.style.display = filename.includes(query) ? '' : 'none';
+    });
+}
+
+// Close modal on outside click
+document.getElementById('requestEvidenceModal').addEventListener('click', function(e) {
+    if (e.target === this) this.style.display = 'none';
+});
+</script>
+
+   
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function switchTab(btn, tab) {
+            document.querySelectorAll('.evidence-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('buyer-section').style.display = 'none';
+            document.getElementById('seller-section').style.display = 'none';
+            document.getElementById('system-section').style.display = 'none';
+            document.getElementById(tab + '-section').style.display = 'block';
+        }
+
+        function switchView(btn, view) {
+            document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (view === 'grid') {
+                document.getElementById('buyer-grid').style.display = 'grid';
+                document.getElementById('buyer-list').style.display = 'none';
+            } else {
+                document.getElementById('buyer-grid').style.display = 'none';
+                document.getElementById('buyer-list').style.display = 'block';
+            }
+        }
+    </script>
+    {% endblock %}

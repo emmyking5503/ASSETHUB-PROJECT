@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EscrowFlow · Welcome back</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static "css/login.css" %}">
+</head>
+<body>
+    <div class="split-layout">
+        <!-- Left Side - Marketplace Showcase with Flying Products -->
+        <div class="showcase-side">
+            <!-- Floating Products Animation -->
+            <div class="floating-products">
+                <div class="floating-product product-1">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&auto=format" alt="Nike Sneakers">
+                    <div class="product-tag">$249</div>
+                </div>
+                <div class="floating-product product-2">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format" alt="Smart Watch">
+                    <div class="product-tag">$399</div>
+                </div>
+                <div class="floating-product product-3">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&auto=format" alt="Headphones">
+                    <div class="product-tag">$159</div>
+                </div>
+                <div class="floating-product product-4">
+                    <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=200&auto=format" alt="Camera">
+                    <div class="product-tag">$899</div>
+                </div>
+                <div class="floating-product product-5">
+                    <img src="https://images.unsplash.com/photo-1546868871-704d779b4f7b?w=200&auto=format" alt="Smart Watch">
+                    <div class="product-tag">$299</div>
+                </div>
+                <div class="floating-product product-6">
+                    <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&auto=format" alt="Shoes">
+                    <div class="product-tag">$189</div>
+                </div>
+                <div class="floating-product product-7">
+                    <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=200&auto=format" alt="Sunglasses">
+                    <div class="product-tag">$129</div>
+                </div>
+                <div class="floating-product product-8">
+                    <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200&auto=format" alt="Camera">
+                    <div class="product-tag">$649</div>
+                </div>
+            </div>
+
+            <!-- Main Showcase Content -->
+            <div class="showcase-content">
+                <div class="showcase-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>250K+ items sold securely</span>
+                </div>
+                
+                <h1 class="showcase-title">
+                    Where <span class="gradient-text">sellers</span> meet<br>
+                    <span class="gradient-text">buyers</span> with confidence
+                </h1>
+                
+                <p class="showcase-description">
+                    Join the fastest-growing escrow marketplace. From sneakers to luxury watches, 
+                    every transaction is protected.
+                </p>
+
+                <!-- Live Activity Feed -->
+                <div class="activity-feed">
+                    <div class="activity-item">
+                        <img src="https://images.unsplash.com/photo-1494790108777-466d68e3a4a1?w=50&auto=format" alt="User">
+                        <div class="activity-details">
+                            <span class="activity-user">Sarah K.</span>
+                            <span class="activity-action">just sold</span>
+                            <span class="activity-item-name">Air Jordan 1</span>
+                        </div>
+                        <span class="activity-price">$420</span>
+                    </div>
+                    <div class="activity-item">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&auto=format" alt="User">
+                        <div class="activity-details">
+                            <span class="activity-user">Mike R.</span>
+                            <span class="activity-action">just bought</span>
+                            <span class="activity-item-name">Rolex Submariner</span>
+                        </div>
+                        <span class="activity-price">$8,950</span>
+                    </div>
+                    <div class="activity-item">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&auto=format" alt="User">
+                        <div class="activity-details">
+                            <span class="activity-user">Emma L.</span>
+                            <span class="activity-action">listed</span>
+                            <span class="activity-item-name">MacBook Pro M3</span>
+                        </div>
+                        <span class="activity-price">$2,499</span>
+                    </div>
+                </div>
+
+                
+            </div>
+            <div class="showcase-overlay"></div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="form-side">
+            <div class="form-container">
+                <!-- Header -->
+                <div class="form-header">
+                    <a href="/" class="mobile-logo">escrow<span>flow</span></a>
+                    <h2>Welcome back</h2>
+                    <p>Sign in to your account</p>
+                </div>
+
+                <!-- Login Form -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert-message">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form class="login-form" method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Email/Username -->
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="far fa-envelope"></i>
+                            Email or username
+                        </label>
+                        <input type="text" id="username" name="username"
+                            placeholder="john@example.com or johndoe123"
+                            class="form-input">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <div class="password-field">
+                            <input type="password" id="password" name="password"
+                                placeholder="••••••••"
+                                class="form-input">
+                            <button type="button" class="password-toggle">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="form-options">
+                        <label class="checkbox">
+                            <input type="checkbox" name="remember">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">Remember me</span>
+                        </label>
+                        <a href="" class="forgot-link">
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn">
+                        <span>Sign in</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <!-- Sign Up Link -->
+                    <div class="signup-link">
+                        Don't have an account?
+                        <a href="{% url 'register' %}">Create free account</a>
+                    </div>
+                </form>
+
+                    <!-- Social Login (Optional) -->
+                <div class="social-login">
+                    <div class="divider">
+                        <span>Or continue with</span>
+                    </div>
+                    <div class="social-buttons">
+                        <button class="social-btn google">
+                            <i class="fab fa-google"></i>
+                            Google
+                        </button>
+                        <button class="social-btn apple">
+                            <i class="fab fa-apple"></i>
+                            Apple
+                        </button>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple JavaScript for password toggle only -->
+    <script src="{% static "js/login.js" %}"></script>
+</body>
+</html>

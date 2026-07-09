@@ -1,0 +1,224 @@
+{% extends 'buyer/buyer_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-content">
+    <nav class="breadcrumb-nav">
+        <a href="{% url 'buyer_dashboard' %}">Dashboard</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'buyer_disputes' %}">My Disputes</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'buyer_dispute_detail' dispute.id %}">#{{ dispute.dispute_id }}</a>
+        <i class="bi bi-chevron-right"></i>
+        <span class="active">Return Item</span>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <h1 class="page-title mb-0">Return Item</h1>
+        <a href="{% url 'buyer_dispute_detail' dispute.id %}" class="action-btn-lg" style="padding:8px 16px;font-size:13px;">
+            <i class="bi bi-arrow-left"></i> Back to Dispute
+        </a>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert alert-warning mb-4" style="background:#fffbeb;border:1px solid #f59e0b;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px;">
+        <i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b;font-size:20px;"></i>
+        <div>
+            <strong style="color:#92400e;">Action Required:</strong>
+            <span style="color:#78350f;">Admin has requested you return the item. Please ship it to the address below and enter tracking details.</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Seller's Return Address -->
+            {% if dispute.seller_return_address %}
+            <div class="detail-card mb-4" style="border-left:3px solid #22c55e;">
+                <div class="detail-card-header" style="background:#f0fdf4;">
+                    <div class="detail-card-title"><i class="bi bi-geo-alt-fill"></i> Ship To This Address</div>
+                </div>
+                <div class="detail-card-body">
+                    <div class="d-flex align-items-start gap-3">
+                        <div style="width:48px;height:48px;background:#dcfce7;border-radius:10px;display:flex;align-items:center;justify-content:center;min-width:48px;">
+                            <i class="bi bi-shop" style="color:#16a34a;font-size:20px;"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600;color:var(--text-primary);margin-bottom:4px;">{{ seller.username }} — Return Address</div>
+                            <div style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-size:14px;line-height:1.7;white-space:pre-line;">{{ dispute.seller_return_address }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="detail-card mb-4" style="border-left:3px solid #f59e0b;">
+                <div class="detail-card-header" style="background:#fffbeb;">
+                    <div class="detail-card-title"><i class="bi bi-clock"></i> Waiting for Seller</div>
+                </div>
+                <div class="detail-card-body">
+                    <p style="color:var(--text-secondary);margin:0;">The seller has not yet provided their return address. You will be notified once it's available.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Return Instructions -->
+            <div class="detail-card mb-4">
+                <div class="detail-card-header">
+                    <div class="detail-card-title"><i class="bi bi-info-circle"></i> Return Instructions</div>
+                </div>
+                <div class="detail-card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;padding:16px;">
+                                <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Product</div>
+                                <div style="font-weight:600;color:var(--text-primary);">{{ product.name }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;padding:16px;">
+                                <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Seller</div>
+                                <div style="font-weight:600;color:var(--text-primary);">{{ seller.username }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;padding:16px;">
+                                <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Refund Amount</div>
+                                <div style="font-weight:600;color:var(--accent-green);">${{ dispute.get_escrow_amount }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;padding:16px;">
+                                <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Your Deadline</div>
+                                <div style="font-weight:600;color:{% if days_remaining <= 2 %}var(--accent-red){% else %}var(--accent-orange){% endif %};">
+                                    {{ days_remaining }} day{{ days_remaining|pluralize }} remaining
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px;">
+                        <h6 style="color:#1e40af;margin-bottom:8px;"><i class="bi bi-lightbulb"></i> Steps to Complete Return</h6>
+                        <ol style="color:#1e40af;margin:0;padding-left:20px;font-size:14px;line-height:1.8;">
+                            <li>Package the item securely in its original packaging (if available)</li>
+                            <li>Ship the item to the seller's address shown above</li>
+                            <li>Enter the courier name and tracking number below</li>
+                            <li>Wait for the seller to confirm receipt</li>
+                            <li>Your refund will be processed once confirmed</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tracking Form -->
+            <div class="detail-card mb-4">
+                <div class="detail-card-header">
+                    <div class="detail-card-title"><i class="bi bi-truck"></i> Shipping Details</div>
+                </div>
+                <div class="detail-card-body">
+                    <form method="post" action="{% url 'buyer_return_tracking' dispute.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="color:var(--text-primary);">
+                                    Courier Service <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="return_courier" class="form-control" required
+                                       placeholder="Enter courier company (e.g. FedEx, DHL, local courier...)"
+                                       style="padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);">
+                                <div class="form-text" style="color:var(--text-muted);font-size:12px;">
+                                    Type any courier company name — not limited to a list.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="color:var(--text-primary);">
+                                    Tracking Number <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="return_tracking" class="form-control" placeholder="e.g. FX-1234567890" required
+                                       style="padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" style="color:var(--text-primary);">Additional Notes (Optional)</label>
+                                <textarea name="notes" class="form-control" rows="3" placeholder="Any special instructions or details about the return..."
+                                          style="padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary" style="padding:10px 24px;">
+                                <i class="bi bi-send"></i> Submit Return Tracking
+                            </button>
+                            <a href="{% url 'buyer_dispute_detail' dispute.id %}" class="btn btn-outline-secondary" style="padding:10px 24px;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div style="position:sticky;top:20px;">
+                <!-- Status Card -->
+                <div class="detail-card mb-3">
+                    <div class="detail-card-header">
+                        <div class="detail-card-title"><i class="bi bi-info-circle"></i> Dispute Status</div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div style="text-align:center;padding:16px 0;">
+                            <div style="width:60px;height:60px;background:var(--accent-orange-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                                <i class="bi bi-box-seam" style="font-size:24px;color:var(--accent-orange);"></i>
+                            </div>
+                            <div style="font-weight:600;color:var(--text-primary);font-size:16px;">Return Required</div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Admin decision: Return item for refund</div>
+                        </div>
+                        <hr style="border-color:var(--border-color);">
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;">
+                            <span style="font-size:12px;color:var(--text-muted);">Dispute ID</span>
+                            <span style="font-weight:600;font-family:monospace;">#{{ dispute.dispute_id }}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;">
+                            <span style="font-size:12px;color:var(--text-muted);">Order</span>
+                            <span style="font-weight:600;">#ORD-{{ dispute.order_item.order.id }}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;">
+                            <span style="font-size:12px;color:var(--text-muted);">Refund</span>
+                            <span style="font-weight:600;color:var(--accent-green);">${{ dispute.get_escrow_amount }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deadline Alert -->
+                <div class="detail-card mb-3" style="border-left:3px solid var(--accent-orange);">
+                    <div class="detail-card-body">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <i class="bi bi-clock" style="font-size:20px;color:var(--accent-orange);"></i>
+                            <div>
+                                <div style="font-weight:600;color:var(--text-primary);">Your Deadline</div>
+                                <div style="font-size:13px;color:var(--text-muted);">
+                                    {{ deadline|date:"F j, Y" }} ({{ days_remaining }} days left)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Need Help Card -->
+                <div class="detail-card mb-3">
+                    <div class="detail-card-header">
+                        <div class="detail-card-title"><i class="bi bi-question-circle"></i> Need Help?</div>
+                    </div>
+                    <div class="detail-card-body">
+                        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">
+                            If you're having trouble returning the item or need an extension, contact support.
+                        </p>
+                        <a href="" class="btn btn-outline-primary w-100" style="padding:8px 16px;font-size:13px;">
+                            <i class="bi bi-headset"></i> Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

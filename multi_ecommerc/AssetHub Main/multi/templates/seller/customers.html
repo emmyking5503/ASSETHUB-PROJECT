@@ -1,0 +1,140 @@
+
+
+    
+{% extends "seller/basee.html" %}
+{% load static %}
+
+{% block page_title %}Customers{% endblock %}
+
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+    
+        <div class="filter-bar">
+            <div class="filter-search">
+                <i class="fa-solid fa-search"></i>
+               <input 
+                    type="text" 
+                    id="searchInput"
+                    placeholder="Search customers..." 
+                    style="width: 400px;"
+                >
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Orders</th>
+                            <th>Total Spent</th>
+                            <th>Last Order</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody id="customerTable">
+                        {% for c in customers %}
+                        <tr>
+                            <td>
+                                <div class="table-product" style="display:flex;align-items:center;gap:10px;">
+    <img src="{{ c.image }}" 
+         style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #eee;">
+    
+    <div>
+        <span style="font-weight:600;">{{ c.username }}</span><br>
+        <small style="color:#888;">Customer</small>
+    </div>
+</div>
+                            </td>
+
+                            <td>{{ c.email }}</td>
+
+                            <td>{{ c.order_count }}</td>
+
+                            <td style="font-weight: 600;">₦{{ c.total_spent }}</td>
+
+                            <td>{{ c.last_order|date:"M d, Y" }}</td>
+
+                           
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:20px;">
+                                No customers yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+{% endblock %}
+
+{% block extra_js  %}
+<script>
+let timer;
+
+document.getElementById("searchInput").addEventListener("keyup", function() {
+    clearTimeout(timer);
+
+    const query = this.value;
+
+    timer = setTimeout(() => {
+        fetch(`/seller/customers/?q=${query}`, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const table = document.getElementById("customerTable");
+            table.innerHTML = "";
+
+            if (data.customers.length === 0) {
+                table.innerHTML = `<tr>
+                    <td colspan="6" style="text-align:center;">No customers found</td>
+                </tr>`;
+                return;
+            }
+
+            data.customers.forEach(customer => {
+                table.innerHTML += `
+                <tr>
+                    <td>
+                        <div class="table-product">
+                            <img src="https://i.pravatar.cc/150?u=${customer.id}">
+                            <span>${customer.username}</span>
+                        </div>
+                    </td>
+                    <td>${customer.email}</td>
+                    <td>${customer.order_count}</td>
+                    <td style="font-weight:600;">₦${customer.total_spent.toFixed(2)}</td>
+                    <td>${customer.last_order}</td>
+                    <td style="text-align:right;">
+                        <button class="btn btn-sm btn-secondary">View</button>
+                    </td>
+                </tr>
+                `;
+            });
+        });
+    }, 400); // debounce
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+          

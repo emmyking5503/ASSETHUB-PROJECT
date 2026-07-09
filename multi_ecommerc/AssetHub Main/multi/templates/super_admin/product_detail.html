@@ -1,0 +1,64 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Product Details - Super Admin{% endblock %}
+{% block listings_active %}active{% endblock %}
+
+{% block content %}
+<div class="detail-panel">
+    <div class="section-header">
+        <div>
+            <h2>{{ product.name }}</h2>
+            <p>{% if product.category %}{{ product.category.name }}{% else %}Uncategorized{% endif %}</p>
+        </div>
+        <a href="{% url 'admin_listings' %}" class="action-btn">Back to listings</a>
+    </div>
+
+    <div class="product-detail-grid">
+        <div class="product-images">
+            {% if product.front_image %}
+                <img src="{{ product.front_image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <img src="/static/images/default-product.png" alt="{{ product.name }}">
+            {% endif %}
+        </div>
+        <div class="product-detail-card">
+            <h3>${{ product.price|floatformat:2 }}</h3>
+            <p>{{ product.description }}</p>
+            <div class="meta-row">
+                <span>Seller: {{ product.seller.username }}</span>
+                <span>Qty: {{ product.quantity }}</span>
+                <span>SKU: {{ product.sku|default:'N/A' }}</span>
+            </div>
+            <div class="status-row">
+                <span>Status:</span>
+                <strong>{% if product.quantity > 0 %}Active{% else %}Out of stock{% endif %}</strong>
+            </div>
+            <div class="product-actions">
+                <form method="post" action="{% url 'admin_delete_product' product.id %}" onsubmit="return confirm('Delete this product?');">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn danger">Delete Listing</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-block">
+        <h3>Reviews</h3>
+        {% if reviews %}
+        <div class="review-list">
+            {% for review in reviews %}
+            <div class="review-item">
+                <strong>{{ review.user.username }}</strong>
+                <span>{{ review.rating }}/5</span>
+                <p>{{ review.comment }}</p>
+                <small>{{ review.created_at|date:"Y-m-d" }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No reviews yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

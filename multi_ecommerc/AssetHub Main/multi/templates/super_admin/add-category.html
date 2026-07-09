@@ -1,0 +1,480 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Add Category - Super Admin{% endblock %}
+{% block extra_css %}
+<style>
+ /* Add Category Page Styles */
+.page-content {
+    padding: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+    background: #000000;
+    color: #f5f5f1;
+}
+
+.form-container {
+    background: #0d0d0d;
+    border-radius: 12px;
+    box-shadow: 0 10px 45px rgba(255, 255, 255, 0.06);
+    padding: 32px;
+}
+
+.form-section {
+    margin-bottom: 32px;
+}
+
+.section-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #222222;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f5f5f1;
+    margin: 0 0 8px 0;
+}
+
+.section-subtitle {
+    font-size: 14px;
+    color: #dcdacf;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f5f5f1;
+    margin-bottom: 8px;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: #f5f5f1;
+    background-color: #121212;
+    border: 1px solid #272727;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-input:hover,
+.form-textarea:hover {
+    border-color: #4a4a4a;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    border-color: #f5f5f1;
+    box-shadow: 0 0 0 3px rgba(245, 245, 241, 0.1);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: #8b8b88;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+}
+
+.file-input {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #f5f5f1;
+    background-color: #121212;
+    border: 2px dashed #2c2c2c;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-input:hover {
+    border-color: #4a4a4a;
+    background-color: #171717;
+}
+
+.file-input:focus {
+    outline: none;
+    border-color: #f5f5f1;
+    box-shadow: 0 0 0 3px rgba(245, 245, 241, 0.1);
+}
+
+.file-input::file-selector-button {
+    padding: 6px 12px;
+    margin-right: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #f5f5f1;
+    background-color: #1c1c1c;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-input::file-selector-button:hover {
+    background-color: #272727;
+    border-color: #555555;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid #222222;
+}
+
+/* Button Styles */
+.btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Primary Button */
+.btn-primary {
+    background: linear-gradient(135deg, #f5f5f1 0%, #e5e5e1 100%);
+    color: #0b0b0b;
+    box-shadow: 0 4px 15px rgba(245, 245, 241, 0.1);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0ec 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 245, 241, 0.2);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(245, 245, 241, 0.15);
+}
+
+.btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(245, 245, 241, 0.3), 0 4px 15px rgba(245, 245, 241, 0.1);
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background: transparent;
+    color: #f5f5f1;
+    border: 1.5px solid #3a3a3a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(245, 245, 241, 0.05);
+    border-color: #555555;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+    background: rgba(245, 245, 241, 0.08);
+}
+
+.btn-secondary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(245, 245, 241, 0.15), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Delete Button */
+.btn-delete {
+    background: transparent;
+    color: #f87171;
+    border: 1.5px solid #3a3a3a;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    letter-spacing: 0.3px;
+    text-transform: none;
+}
+
+.btn-delete:hover {
+    background: rgba(248, 113, 113, 0.1);
+    border-color: #f87171;
+    color: #fca5a5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(248, 113, 113, 0.15);
+}
+
+.btn-delete:active {
+    transform: translateY(0);
+    background: rgba(248, 113, 113, 0.15);
+}
+
+.btn-delete:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
+}
+
+/* Disabled Button State */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Alert Messages */
+.alert-wrapper {
+    margin-top: 20px;
+}
+
+.alert-box {
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: #f5f5f1;
+    border: 1px solid rgba(245, 245, 241, 0.12);
+    background: rgba(245, 245, 241, 0.08);
+}
+
+.alert-box.success {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.08);
+}
+
+.alert-box.error,
+.alert-box.danger {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+/* Category List */
+.category-list-card {
+    margin-top: 32px;
+    padding: 24px;
+    border-radius: 18px;
+    border: 1px solid #222222;
+    background: #0b0b0b;
+}
+
+.category-table-wrapper {
+    overflow-x: auto;
+}
+
+.category-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 640px;
+}
+
+.category-table th,
+.category-table td {
+    text-align: left;
+    padding: 16px 18px;
+    border-bottom: 1px solid #222222;
+    color: #f5f5f1;
+}
+
+.category-table th {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #b8b8b3;
+    font-weight: 600;
+}
+
+.category-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.delete-form {
+    display: inline-block;
+}
+
+.no-categories {
+    color: #c8c8c0;
+    padding: 14px 0 0;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-content {
+        padding: 16px;
+    }
+
+    .form-container {
+        padding: 24px;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+    
+    .category-table th,
+    .category-table td {
+        padding: 12px 14px;
+    }
+}
+
+/* Loading State for Buttons */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: button-spin 0.6s linear infinite;
+}
+
+@keyframes button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Animation */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container {
+    animation: slideUp 0.3s ease-out;
+}
+</style>
+{% endblock %}
+{% block add_category_active %}active{% endblock %}
+
+
+{% block content %}
+<div class="page-content">
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data" action="{% url 'add_category' %}">
+            {% csrf_token %}
+            <section class="form-section">
+                <div class="section-header">
+                    <h2 class="section-title">Add New Category</h2>
+                    <p class="section-subtitle">Create a category for sellers to assign their products to.</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="categoryName">Category Name <span style="color:red">*</span></label>
+                    <input type="text" id="categoryName" name="name" class="form-input" placeholder="e.g., Electronics" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="categoryDescription">Description</label>
+                    <textarea id="categoryDescription" name="description" class="form-textarea" rows="3" placeholder="Describe this category..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="categoryImageInput">Category Image</label>
+                    <input type="file" name="image" class="file-input" accept="image/*" id="categoryImageInput">
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Category</button>
+            </div>
+        </form>
+
+        {% if messages %}
+        <div class="alert-wrapper">
+            {% for message in messages %}
+                <div class="alert-box {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="category-list-card">
+            <div class="section-header">
+                <h3 class="section-title">Existing Categories</h3>
+                <p class="section-subtitle">Manage categories available to sellers.</p>
+            </div>
+
+            {% if categories %}
+            <div class="category-table-wrapper">
+                <table class="category-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>{{ category.name }}</td>
+                            <td>{{ category.description|default:'-' }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'delete_category' category.id %}" class="delete-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="no-categories">No categories have been added yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends "seller/basee.html" %}
+{% load static %}
+
+{% block title %}My Disputes · AssetHub{% endblock %}
+{% block page_title %}My Disputes{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <a href="{% url 'seller_dashboard' %}"><i class="bi bi-house-door"></i> Home</a>
+    <span class="separator"><i class="bi bi-chevron-right"></i></span>
+    <span class="current">My Disputes</span>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1>
+        <span class="header-icon"><i class="bi bi-shield-exclamation" style="color: var(--danger);"></i></span>
+        My Disputes
+    </h1>
+    <p style="color: var(--gray-500); margin-top: 8px;">
+        Track and manage all dispute claims filed against you. Respond promptly to protect your seller reputation.
+    </p>
+</div>
+
+<!-- Stats Summary -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px;">
+    <div class="ah-card" style="margin-bottom: 0;">
+        <div class="ah-card-body" style="padding: 20px 24px; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--warning-light), #fde68a); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--warning); font-size: 22px;">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: 800; color: var(--gray-900);">{{ awaiting_response_count }}</div>
+                <div style="font-size: 13px; color: var(--gray-500);">Awaiting Your Response</div>
+            </div>
+        </div>
+    </div>
+    <div class="ah-card" style="margin-bottom: 0;">
+        <div class="ah-card-body" style="padding: 20px 24px; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--info-light), #bfdbfe); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--info); font-size: 22px;">
+                <i class="bi bi-search"></i>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: 800; color: var(--gray-900);">{{ under_review_count }}</div>
+                <div style="font-size: 13px; color: var(--gray-500);">Under Review</div>
+            </div>
+        </div>
+    </div>
+    <div class="ah-card" style="margin-bottom: 0;">
+        <div class="ah-card-body" style="padding: 20px 24px; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--success-light), #a7f3d0); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 22px;">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: 800; color: var(--gray-900);">{{ resolved_count }}</div>
+                <div style="font-size: 13px; color: var(--gray-500);">Resolved</div>
+            </div>
+        </div>
+    </div>
+    <div class="ah-card" style="margin-bottom: 0;">
+        <div class="ah-card-body" style="padding: 20px 24px; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--danger-light), #fecaca); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 22px;">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: 800; color: var(--gray-900);">${{ total_escrow_at_risk|floatformat:2 }}</div>
+                <div style="font-size: 13px; color: var(--gray-500);">Total Escrow at Risk</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Disputes List -->
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-list-ul"></i>All Disputes</h2>
+        <span class="badge-ah badge-ah-gray">{{ disputes|length }} total</span>
+    </div>
+    <div class="ah-card-body" style="padding: 0;">
+        
+        {% if disputes %}
+        <div style="display: flex; flex-direction: column;">
+            {% for dispute in disputes %}
+            <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 20px; padding: 24px; border-bottom: 1px solid var(--gray-100); align-items: center; transition: var(--transition); {% if forloop.last %}border-bottom: none;{% endif %}" 
+                 onmouseover="this.style.background='var(--gray-50)'" 
+                 onmouseout="this.style.background='transparent'">
+                
+                <!-- Product Image -->
+                <div style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; border: 1px solid var(--gray-200); flex-shrink: 0; background: #fff;">
+                    {% if dispute.order_item.product.front_image %}
+                        <img src="{{ dispute.order_item.product.front_image.url }}" alt="{{ dispute.order_item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--gray-100); color: var(--gray-400);">
+                            <i class="bi bi-image" style="font-size: 24px;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Dispute Info -->
+                <div style="min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px;">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--gray-900); margin: 0;">
+                            {{ dispute.order_item.product.name|truncatechars:40 }}
+                        </h4>
+                        
+                        <!-- Status Badge -->
+                        {% if dispute.status == 'awaiting_seller' %}
+                            <span class="badge-ah badge-ah-danger"><i class="bi bi-exclamation-circle"></i> Action Required</span>
+                        {% elif dispute.status == 'under_review' %}
+                            <span class="badge-ah badge-ah-info"><i class="bi bi-search"></i> Under Review</span>
+                        {% elif dispute.status == 'more_info' %}
+                            <span class="badge-ah badge-ah-warning"><i class="bi bi-info-circle"></i> More Info Needed</span>
+                        {% elif dispute.status == 'awaiting_buyer' %}
+                            <span class="badge-ah badge-ah-warning"><i class="bi bi-reply"></i> Awaiting Buyer</span>
+                        {% elif dispute.status == 'resolved_buyer' %}
+                            <span class="badge-ah badge-ah-danger"><i class="bi bi-x-circle"></i> Lost — Buyer Won</span>
+                        {% elif dispute.status == 'resolved_seller' %}
+                            <span class="badge-ah badge-ah-success"><i class="bi bi-check-circle"></i> Won — In Your Favor</span>
+                        {% elif dispute.status == 'resolved_mutual' %}
+                            <span class="badge-ah badge-ah-purple"><i class="bi bi-check-circle"></i> Mutual Agreement</span>
+                        {% elif dispute.status == 'return_required' %}
+                            <span class="badge-ah badge-ah-warning"><i class="bi bi-box-seam"></i> Return Required</span>
+                        {% elif dispute.status == 'return_shipped' %}
+                            <span class="badge-ah badge-ah-info"><i class="bi bi-truck"></i> Return Shipped</span>
+                        {% elif dispute.status == 'return_received' %}
+                            <span class="badge-ah badge-ah-success"><i class="bi bi-check-circle"></i> Return Received</span>
+                        {% elif dispute.status == 'cancelled' %}
+                            <span class="badge-ah badge-ah-gray"><i class="bi bi-x-circle"></i> Cancelled</span>
+                        {% else %}
+                            <span class="badge-ah badge-ah-gray">{{ dispute.status }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div style="font-size: 13px; color: var(--gray-500); display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+                        <span><i class="bi bi-shield-exclamation" style="margin-right: 4px;"></i> {{ dispute.dispute_id }}</span>
+                        <span style="color: var(--gray-300);">·</span>
+                        <span><i class="bi bi-person" style="margin-right: 4px;"></i> {{ dispute.buyer.username }}</span>
+                        <span style="color: var(--gray-300);">·</span>
+                        <span><i class="bi bi-exclamation-triangle" style="margin-right: 4px;"></i> {{ dispute.get_reason_display }}</span>
+                        <span style="color: var(--gray-300);">·</span>
+                        <span><i class="bi bi-calendar" style="margin-right: 4px;"></i> {{ dispute.created_at|date:"M d, Y" }}</span>
+                        <span style="color: var(--gray-300);">·</span>
+                        <span style="color: var(--primary); font-weight: 600;"><i class="bi bi-lock-fill" style="margin-right: 4px;"></i> ${{ dispute.get_escrow_amount|floatformat:2 }} at risk</span>
+                    </div>
+                    
+                    {% if dispute.status == 'awaiting_seller' and dispute.seller_deadline %}
+                    <div style="margin-top: 8px; font-size: 12px; color: var(--danger); font-weight: 600;">
+                        <i class="bi bi-clock-history"></i> Respond by {{ dispute.seller_deadline|date:"M d, Y · h:i A" }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if dispute.status == 'more_info' %}
+                    <div style="margin-top: 8px; font-size: 12px; color: var(--warning);">
+                        <i class="bi bi-bell-fill"></i> Admin requested more information — check dispute details
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0;">
+                    {% if dispute.status == 'awaiting_seller' %}
+                        <a href="{% url 'seller_respond_dispute' dispute.id %}" 
+                           style="background: linear-gradient(135deg, var(--danger), #dc2626); color: #fff; padding: 10px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);"
+                           onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.35)'"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(239, 68, 68, 0.25)'">
+                            <i class="bi bi-reply"></i> Respond Now
+                        </a>
+                    {% else %}
+                        <a href="{% url 'seller_dispute_detail' dispute.id %}" 
+                           style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 10px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition); box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);"
+                           onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(99, 102, 241, 0.35)'"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(99, 102, 241, 0.25)'">
+                            <i class="bi bi-eye"></i> View Details
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% else %}
+        <!-- Empty State -->
+        <div style="text-align: center; padding: 60px 24px;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--gray-100), var(--gray-50)); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--gray-400); font-size: 36px;">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 8px;">No Disputes Found</h3>
+            <p style="font-size: 14px; color: var(--gray-500); max-width: 400px; margin: 0 auto 24px;">
+                Great news! No disputes have been filed against you. Keep providing excellent service to maintain your clean record.
+            </p>
+            <a href="{% url 'seller_order' %}" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="bi bi-receipt"></i> View My Orders
+            </a>
+        </div>
+        {% endif %}
+        
+    </div>
+</div>
+
+<!-- Quick Info -->
+<div class="ah-card" style="background: linear-gradient(135deg, var(--info-subtle), #f0f9ff); border-color: #bfdbfe;">
+    <div class="ah-card-body" style="padding: 20px 24px;">
+        <div style="display: flex; align-items: flex-start; gap: 14px;">
+            <i class="bi bi-info-circle-fill" style="color: var(--info); font-size: 22px; margin-top: 2px;"></i>
+            <div>
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px;">Seller Tips</h4>
+                <p style="font-size: 13px; color: var(--gray-600); margin: 0; line-height: 1.6;">
+                    Respond to disputes within 5 days to avoid automatic decisions. Provide clear evidence including packing photos, tracking info, and delivery confirmations. 
+                    <a href="{% url 'contact' %}" style="color: var(--primary); font-weight: 600;">Contact support</a> if you need help.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

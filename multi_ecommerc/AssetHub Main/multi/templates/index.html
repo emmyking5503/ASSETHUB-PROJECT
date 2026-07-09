@@ -1,0 +1,1507 @@
+{% extends 'main_base.html' %}
+{% load static %}
+
+{% block title %}Assethub · Premium Multi-Vendor Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Additional styles specific to homepage */
+  .hero {
+    padding: 10rem 0 6rem;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f8fafd 0%, #eef4fa 100%);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    right: -5%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(44,143,110,0.08) 0%, transparent 60%);
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: center;
+    gap: 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-content {
+    max-width: 600px;
+  }
+
+  .hero-content h1 {
+    margin: 1.5rem 0 1.25rem;
+    color: var(--text-dark);
+  }
+
+  .hero-sub {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+
+  .trust-strip {
+    display: flex;
+    gap: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+
+  .trust-strip span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+  }
+
+  .trust-strip i {
+    color: var(--accent-success);
+    font-size: 1.1rem;
+  }
+
+  .hero-visual {
+    position: relative;
+    perspective: 1000px;
+  }
+
+  .hero-img-wrapper {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    transform: rotateY(-5deg) rotateX(5deg);
+    transition: transform 0.6s ease;
+  }
+
+  .hero-img-wrapper:hover {
+    transform: rotateY(0deg) rotateX(0deg);
+  }
+
+  .hero-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.7s ease;
+  }
+
+  .hero-img-wrapper:hover .hero-img {
+    transform: scale(1.05);
+  }
+
+  .floating-card {
+    position: absolute;
+    bottom: 30px;
+    left: -30px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: float 6s ease-in-out infinite;
+    z-index: 10;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-10px) translateX(5px); }
+  }
+
+  .live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 122, 92, 0.1);
+    color: var(--accent-success);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .live-indicator::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent-success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Stats Section */
+  .stats {
+    padding: 4rem 0;
+    background: white;
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  .stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 40px;
+    width: 1px;
+    background: var(--border-light);
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-item span {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* Product Sections */
+  .featured-products, .new-arrivals, .top-rated, .deal-products {
+    padding: 3rem 0;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border: 1px solid var(--border-light);
+    position: relative;
+  }
+
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-light);
+  }
+
+  .card-image {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8eef5 100%);
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .product-card:hover .card-image img {
+    transform: scale(1.08);
+  }
+
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 1rem;
+  }
+
+  .product-card:hover .card-overlay {
+    opacity: 1;
+  }
+
+  .quick-view {
+    background: white;
+    color: var(--text-dark);
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .product-card:hover .quick-view {
+    transform: translateY(0);
+  }
+
+  .wishlist-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 38px;
+    height: 38px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: 0.3s;
+    z-index: 10;
+  }
+
+  .wishlist-icon i {
+    color: #ef4444;
+    font-size: 16px;
+  }
+
+  .wishlist-icon:hover {
+    transform: scale(1.1);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.4rem 0.875rem;
+    border-radius: 20px;
+    z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .product-badge.featured { 
+    background: var(--accent-warm); 
+    color: white;
+  }
+  .product-badge.new { 
+    background: var(--accent); 
+    color: white;
+  }
+  .product-badge.top { 
+    background: var(--accent-success); 
+    color: white;
+  }
+  .product-badge.discount { 
+    background: #dc2626; 
+    color: white;
+  }
+
+  .card-content {
+    padding: 1.25rem;
+  }
+
+  .product-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-dark);
+    line-height: 1.4;
+  }
+
+  .product-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .product-title a:hover {
+    color: var(--accent);
+  }
+
+  .seller-row {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .seller-row a {
+    color: var(--text-dark);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .seller-row a:hover {
+    color: var(--accent);
+  }
+
+  .verified-badge {
+    color: var(--accent);
+    font-size: 0.75rem;
+  }
+
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .rating i {
+    color: #fbbf24;
+    font-size: 0.75rem;
+  }
+
+  .rating span {
+    color: var(--text-muted);
+    margin-left: 0.25rem;
+  }
+
+  .product-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .product-price .original {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    font-weight: 500;
+  }
+
+  .short-description {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-small {
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: var(--transition);
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 0.375rem;
+    cursor: pointer;
+  }
+
+  .btn-outline-small {
+    background: white;
+    border-color: var(--border-soft);
+    color: var(--text-dark);
+  }
+  
+  .btn-outline-small:hover {
+    background: var(--bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-primary-small {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  
+  .btn-primary-small:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-light);
+  }
+
+  /* Categories */
+  .categories {
+    padding: 4rem 0;
+    background: white;
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .category-card {
+    height: 280px;
+    border-radius: var(--radius-lg);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .category-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+    transition: opacity 0.3s;
+  }
+
+  .category-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .category-card:hover::after {
+    opacity: 0.2;
+  }
+
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .category-card h3, .category-card p {
+    position: relative;
+    z-index: 2;
+    transform: translateY(10px);
+    transition: transform 0.3s;
+  }
+
+  .category-card:hover h3 {
+    transform: translateY(0);
+  }
+
+  .category-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .category-card p {
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+
+  .category-link {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    z-index: 3;
+  }
+
+  .category-card:hover .category-link {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Trending Section */
+  .trending-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .trending-card {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border: 1px solid var(--border-light);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .trending-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  
+  .trending-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-light);
+  }
+  
+  .trending-card:hover::before {
+    transform: scaleX(1);
+  }
+  
+  .trending-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, rgba(44,143,110,0.1) 0%, rgba(44,143,110,0.05) 100%);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 1.75rem;
+    color: var(--accent);
+    transition: var(--transition);
+  }
+  
+  .trending-card:hover .trending-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: white;
+  }
+  
+  .trending-card h4 {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-weight: 600;
+  }
+  
+  .trending-card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .trending-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: gap 0.3s;
+  }
+
+  .trending-card:hover .trending-link {
+    gap: 0.625rem;
+  }
+
+  /* How It Works */
+  .how-works {
+    padding: 5rem 0;
+    background: linear-gradient(180deg, var(--bg) 0%, white 100%);
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    position: relative;
+  }
+
+  .steps-grid::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 12.5%;
+    right: 12.5%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--border-light) 0%, var(--accent) 50%, var(--border-light) 100%);
+    z-index: 0;
+  }
+
+  .step-card {
+    background: white;
+    padding: 2.5rem 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    text-align: center;
+    border: 1px solid var(--border-light);
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-light);
+  }
+
+  .step-number {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 4px 12px rgba(44, 143, 110, 0.3);
+  }
+
+  .step-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--accent);
+  }
+
+  .step-card h4 {
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-dark);
+    font-weight: 600;
+  }
+
+  .step-card p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Why Us */
+  .why-us {
+    padding: 5rem 0;
+    background: white;
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .why-card {
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    transition: var(--transition);
+    border: 1px solid transparent;
+  }
+
+  .why-card:hover {
+    background: var(--bg);
+    border-color: var(--border-light);
+    transform: translateY(-5px);
+  }
+
+  .why-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(44, 143, 110, 0.1);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+    transition: var(--transition);
+  }
+
+  .why-card:hover .why-icon {
+    background: var(--accent);
+    color: white;
+    transform: rotate(5deg);
+  }
+
+  .why-card h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-weight: 600;
+  }
+
+  .why-card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    padding: 5rem 0;
+    background: linear-gradient(180deg, var(--bg) 0%, white 100%);
+    overflow: hidden;
+  }
+
+  .testimonials-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .testimonials-track {
+    display: flex;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .testimonial-slide {
+    flex: 0 0 100%;
+    padding: 0 1rem;
+  }
+
+  .testimonial-card {
+    background: white;
+    padding: 3rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    border: 1px solid var(--border-light);
+    position: relative;
+  }
+
+  .testimonial-card::before {
+    content: '"';
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    font-size: 6rem;
+    color: var(--accent);
+    opacity: 0.1;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+
+  .testimonial-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    object-fit: cover;
+    border: 4px solid var(--bg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .testimonial-card p {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+    line-height: 1.7;
+    font-weight: 500;
+  }
+
+  .testimonial-author {
+    margin-bottom: 0.25rem;
+  }
+
+  .testimonial-author h5 {
+    font-size: 1.1rem;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .testimonial-card span {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    text-transform: capitalize;
+  }
+
+  .testimonial-rating {
+    margin-top: 1rem;
+    color: #fbbf24;
+    font-size: 1.1rem;
+  }
+
+  .carousel-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2.5rem;
+  }
+
+  .carousel-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--border-soft);
+    background: white;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .carousel-btn:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    transform: scale(1.1);
+  }
+
+  .carousel-dots {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--border-soft);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .dot.active {
+    background: var(--accent);
+    transform: scale(1.2);
+  }
+
+  /* CTA Banner */
+  .cta-banner {
+    padding: 5rem 0;
+  }
+
+  .cta-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: var(--radius-lg);
+    padding: 5rem 3rem;
+    text-align: center;
+    color: white;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    animation: rotate 20s linear infinite;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .cta-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-card h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 1rem;
+    color: white;
+  }
+
+  .cta-card p {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-card .btn-primary {
+    background: white;
+    color: var(--primary);
+    font-size: 1.1rem;
+    padding: 1rem 2.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  
+  .cta-card .btn-primary:hover {
+    background: var(--bg);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  }
+
+  @media (max-width: 1024px) {
+    .product-grid, .category-grid, .steps-grid, .why-grid, .trending-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-item:nth-child(2)::after {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 3rem;
+    }
+    
+    .hero-content {
+      max-width: 100%;
+    }
+    
+    .hero-btns {
+      justify-content: center;
+    }
+    
+    .trust-strip {
+      justify-content: center;
+    }
+    
+    .hero-visual {
+      order: -1;
+    }
+    
+    .floating-card {
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 20px;
+    }
+    
+    .product-grid, .category-grid, .steps-grid, .why-grid, .trending-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .steps-grid::before {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-grid, .category-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .trending-grid, .why-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .stat-item::after {
+      display: none;
+    }
+    
+    .hero-btns {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .hero-btns .btn-primary,
+    .hero-btns .btn-outline {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" id="home">
+  <div class="container hero-grid">
+    <div class="hero-content" data-aos="fade-right">
+      <div class="badge">
+        <span class="live-indicator">Live</span>
+        Secure marketplace system
+      </div>
+      <h1>Buy & sell with <span class="gradient-text">confidence</span></h1>
+      <p class="hero-sub">
+        Assethub is a modern multi-vendor marketplace where anyone can post products, 
+        buy from other users, and complete transactions securely with our advanced escrow protection.
+      </p>
+      <div class="hero-btns">
+        <button class="btn-primary btn-large" onclick="{% if user.is_authenticated %}window.location.href='{% url 'add_product' %}'{% else %}window.location.href='{% url 'login' %}'{% endif %}">
+          <i class="fa-solid fa-plus"></i> List your product
+        </button>
+        <button class="btn-outline btn-large" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
+          <i class="fa-solid fa-store"></i> Explore marketplace
+        </button>
+      </div>
+      <div class="trust-strip">
+        <span><i class="fa-solid fa-shield-halved"></i> Secure payments</span>
+        <span><i class="fa-solid fa-user-check"></i> Verified users</span>
+        <span><i class="fa-solid fa-headset"></i> 24/7 support</span>
+      </div>
+    </div>
+    <div class="hero-visual" data-aos="fade-left">
+      <div class="hero-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&auto=format&fit=crop" class="hero-img" alt="Marketplace">
+      </div>
+      <div class="floating-card">
+        <i class="fa-solid fa-circle-check" style="color: var(--accent-success);"></i>
+        <div>
+          <div style="font-weight: 700;">Secure</div>
+          <div style="font-size: 0.8rem; opacity: 0.8;">in escrow protection</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Featured Products -->
+<section class="featured-products" id="products">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <h2><i class="fa-regular fa-star" style="color: var(--accent);"></i> Featured items</h2>
+      <a href="{% url 'new_products' %}" class="section-link">
+        View all new <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="product-grid">
+      {% for product in featured_products %}
+      <div class="product-card" data-aos="fade-up">
+        <div class="card-image">
+          {% if product.average_rating >= 4 %}
+            <span class="product-badge top">Top Rated</span>
+          {% endif %}
+          <a href="{% url 'toggle_wishlist' product.id %}" class="wishlist-icon">
+            <i class="{% if product.id in wishlist_products %}fas{% else %}far{% endif %} fa-heart"></i>
+          </a>
+          <img src="{{ product.front_image.url }}" alt="{{ product.name }}">
+          <div class="card-overlay">
+            <a href="{% url 'product_detail' product.slug %}" class="quick-view">
+              Quick View
+            </a>
+          </div>
+        </div>
+        <div class="card-content">
+          <h3 class="product-title">
+            <a href="{% url 'product_detail' product.slug %}">
+              {{ product.name }}
+            </a>
+          </h3>
+          <div class="seller-row">
+            <a href="#">@{{ product.seller.username }}</a>
+            <i class="fa-solid fa-circle-check verified-badge"></i>
+          </div>
+          <div class="rating">
+            {% with avg=product.average_rating %}
+              {% for i in "12345" %}
+                {% if forloop.counter <= avg %}
+                  <i class="fa-solid fa-star"></i>
+                {% else %}
+                  <i class="fa-regular fa-star"></i>
+                {% endif %}
+              {% endfor %}
+              <span>({{ product.rating_count }})</span>
+            {% endwith %}
+          </div>
+          <div class="product-price">${{ product.price }}</div>
+          <div class="short-description">
+            {{ product.description|truncatechars:60 }}
+          </div>
+          <div class="card-actions">
+            <a href="{% url 'product_detail' product.slug %}" class="btn-small btn-outline-small">
+              Details
+            </a>
+            <a href="{% url 'add_to_cart' product.id %}" class="btn-small btn-primary-small">
+              <i class="fa-solid fa-bolt"></i> Buy Now
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- New Arrivals -->
+<section class="new-arrivals">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <h2><i class="fa-regular fa-clock" style="color: var(--accent);"></i> New arrivals</h2>
+      <a href="{% url 'new_products' %}" class="section-link">
+        View all new <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="product-grid">
+      {% for product in new_products %}
+      <div class="product-card" data-aos="fade-up">
+        <div class="card-image">
+          <span class="product-badge new">New</span>
+          <a href="{% url 'toggle_wishlist' product.id %}" class="wishlist-icon">
+            <i class="{% if product.id in wishlist_products %}fas{% else %}far{% endif %} fa-heart"></i>
+          </a>
+          <img src="{{ product.front_image.url }}" alt="{{ product.name }}">
+          <div class="card-overlay">
+            <a href="{% url 'product_detail' product.slug %}" class="quick-view">
+              Quick View
+            </a>
+          </div>
+        </div>
+        <div class="card-content">
+          <h3 class="product-title">
+            <a href="{% url 'product_detail' product.slug %}">
+              {{ product.name }}
+            </a>
+          </h3>
+          <div class="seller-row">
+            <a href="#">@{{ product.seller.username }}</a>
+            <i class="fa-solid fa-circle-check verified-badge"></i>
+          </div>
+          <div class="rating">
+            {% with avg=product.average_rating %}
+              {% for i in "12345" %}
+                {% if forloop.counter <= avg %}
+                  <i class="fa-solid fa-star"></i>
+                {% else %}
+                  <i class="fa-regular fa-star"></i>
+                {% endif %}
+              {% endfor %}
+              <span>({{ product.rating_count }})</span>
+            {% endwith %}
+          </div>
+          <div class="product-price">${{ product.price }}</div>
+          <div class="short-description">
+            {{ product.description|truncatechars:60 }}
+          </div>
+          <div class="card-actions">
+            <a href="{% url 'product_detail' product.slug %}" class="btn-small btn-outline-small">
+              Details
+            </a>
+            <a href="{% url 'add_to_cart' product.id %}" class="btn-small btn-primary-small">
+              <i class="fa-solid fa-bolt"></i> Buy Now
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<!-- How It Works -->
+<section class="how-works" id="features">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">
+      How <span class="gradient-text">Assethub works</span>
+    </h2>
+    <div class="steps-grid">
+      <div class="step-card" data-aos="fade-up">
+        <div class="step-number">1</div>
+        <div class="step-icon"><i class="fa-solid fa-user-plus"></i></div>
+        <h4>Create Account</h4>
+        <p>Join our community of buyers and sellers in seconds with email or social login.</p>
+      </div>
+      <div class="step-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="step-number">2</div>
+        <div class="step-icon"><i class="fa-solid fa-upload"></i></div>
+        <h4>List or Browse</h4>
+        <p>Post your items with photos or explore thousands of verified listings.</p>
+      </div>
+      <div class="step-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="step-number">3</div>
+        <div class="step-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <h4>Secure Payment</h4>
+        <p>Funds are held safely in escrow until you confirm delivery satisfaction.</p>
+      </div>
+      <div class="step-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="step-number">4</div>
+        <div class="step-icon"><i class="fa-solid fa-handshake"></i></div>
+        <h4>Complete Deal</h4>
+        <p>Rate your experience and build your reputation in the community.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="why-us" id="why_us">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Why trust <span class="gradient-text">Assethub</span></h2>
+    <div class="why-grid">
+      <div class="why-card" data-aos="fade-up">
+        <div class="why-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+        <h4>Zero-Fee Disputes</h4>
+        <p>Expert mediation at no cost to ensure fair resolutions every time.</p>
+      </div>
+      <div class="why-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="why-icon"><i class="fa-solid fa-lock"></i></div>
+       <h4>Secure Transactions</h4>
+<p>AssetHub provides a secure environment for buyers and sellers with escrow-supported transactions and user verification.</p>
+      </div>
+      <div class="why-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="why-icon"><i class="fa-solid fa-bolt"></i></div>
+        <h4>Instant Payouts</h4>
+        <p>Sellers receive funds immediately after buyer confirmation.</p>
+      </div>
+      <div class="why-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="why-icon"><i class="fa-solid fa-globe"></i></div>
+        <h4>Global Community</h4>
+        <p>Buy and sell with confidence across countries worldwide.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- CTA Banner -->
+<section class="cta-banner">
+  <div class="container">
+    <div class="cta-card" data-aos="zoom-in">
+      <div class="cta-content">
+        <h2>Ready to start selling?</h2>
+        <p>Join Our community of sellers already growing their business on Assethub</p>
+        
+        <div class="cta-actions">
+
+          {% if user.is_authenticated %}
+            
+            {% if user.is_superuser %}
+              <a href="{% url 'super_admin' %}" class="btn-primary">
+                Go to Admin Dashboard
+              </a>
+
+            {% elif user.role == 'seller' %}
+              <a href="{% url 'seller_dashboard' %}" class="btn-primary">
+                Go to Seller Dashboard
+              </a>
+
+            {% elif user.role == 'both' %}
+              <a href="{% url 'seller_dashboard' %}" class="btn-primary">
+                Go to Seller Dashboard
+              </a>
+
+            {% elif user.role == 'buyer' %}
+              <a href="{% url 'buyer_dashboard' %}" class="btn-primary">
+                Go to My Account
+              </a>
+            {% endif %}
+
+          {% else %}
+            <a href="{% url 'register' %}" class="btn-primary btn-large">
+              Create Your Free Account
+            </a>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>  
+
+{% block extra_js %}
+<script>
+  // Testimonials Carousel
+  let currentTestimonial = 0;
+  const track = document.getElementById('testimonialsTrack');
+  const dots = document.querySelectorAll('.dot');
+  const totalTestimonials = dots.length;
+
+  function updateTestimonial() {
+    if (!track) return;
+    track.style.transform = `translateX(-${currentTestimonial * 100}%)`;
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentTestimonial);
+    });
+  }
+
+  function moveTestimonial(direction) {
+    currentTestimonial = (currentTestimonial + direction + totalTestimonials) % totalTestimonials;
+    updateTestimonial();
+  }
+
+  function goToTestimonial(index) {
+    currentTestimonial = index;
+    updateTestimonial();
+  }
+
+  if (track) {
+    setInterval(() => moveTestimonial(1), 6000);
+  }
+
+  // Statistics Counter
+  const statNumbers = document.querySelectorAll('.stat-number');
+  const statsSection = document.querySelector('.stats');
+  let statsAnimated = false;
+
+  function animateStats() {
+    statNumbers.forEach(stat => {
+      const target = parseFloat(stat.dataset.target);
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
+
+      function update() {
+        current += increment;
+        if (current < target) {
+          stat.textContent = current.toFixed(1).replace(/\.0$/, '') + (target === 1.8 ? '' : '');
+          requestAnimationFrame(update);
+        } else {
+          stat.textContent = target + (target === 1.8 ? '' : '');
+        }
+      }
+      update();
+    });
+  }
+
+  if (statsSection) {
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !statsAnimated) {
+          statsAnimated = true;
+          animateStats();
+        }
+      });
+    }, { threshold: 0.5 });
+    statsObserver.observe(statsSection);
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      document.cookie.split(';').forEach(cookie => {
+        const cookiePair = cookie.trim();
+        if (cookiePair.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookiePair.slice(name.length + 1));
+        }
+      });
+    }
+    return cookieValue;
+  }
+
+  document.querySelectorAll('.wishlist-icon[href*="/toggle-wishlist/"]').forEach(link => {
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+      const url = this.href;
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({})
+      })
+      .then(response => {
+        const contentType = response.headers.get('content-type') || '';
+        if (!response.ok) {
+          throw new Error('Server error: ' + response.status);
+        }
+        if (!contentType.includes('application/json')) {
+          window.location.href = '{% url "login" %}';
+          return null;
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (!data) return;
+        if (data.success) {
+          const icon = this.querySelector('i');
+          if (icon) {
+            if (data.added) {
+              icon.classList.remove('far');
+              icon.classList.add('fas');
+            } else {
+              icon.classList.remove('fas');
+              icon.classList.add('far');
+            }
+          }
+        } else if (data.redirect) {
+          window.location.href = data.redirect;
+        }
+      })
+      .catch(error => {
+        console.error('Wishlist toggle failed:', error);
+      });
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

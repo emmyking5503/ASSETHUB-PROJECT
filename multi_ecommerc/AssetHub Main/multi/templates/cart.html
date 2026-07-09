@@ -1,0 +1,247 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart · Marketplace</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static "css/cart.css" %}">
+    <style>
+        .discount-price{
+            font-size:15px;
+            font-weight:700;
+            color:#e63946;
+        }
+
+        .original-price{
+            font-size:12px;
+            text-decoration:line-through;
+            color:#888;
+            margin-left:6px;
+        }
+
+        .normal-price{
+            font-size:10px;
+            font-weight:700;
+            color:#111;
+        }
+    </style>
+</head>
+<body>
+    <!-- Simple Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{% url 'home' %}" class="logo">market<span>place</span></a>
+                
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Page Title -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Your Cart</h1>
+                    <p class="page-subtitle">Review your items before proceeding to payment</p>
+                </div>
+                <div class="cart-count" id="cartCount">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="itemCount">{{ item_count }}</span> items
+                </div>
+            </div>
+
+                <!-- Cart Grid -->
+                <div class="cart-grid">
+                    <!-- Left Column - Cart Items -->
+                    <div class="cart-items-section">
+                        <div class="cart-items" id="cartItems">
+
+                        {% for item in items %}
+                        <div class="cart-item">
+                            
+                            <div class="item-image">
+                                {% if item.product.front_image %}
+                                <img src="{{ item.product.front_image.url }}" alt="{{ item.product.name }}">
+                                {% else %}
+                                <img src="/static/images/no-image.png">
+                                {% endif %}
+                            </div>
+
+                            <div class="item-content">
+
+                                <div class="item-header">
+                                    <div>
+                                        <h3 class="item-title">{{ item.product.name }}</h3>
+
+                                        <div class="item-seller">
+                                            <i class="fas fa-store"></i>
+                                            <span>{{ item.product.seller }}</span>
+
+                                            
+                                            <i class="fas fa-check-circle verified-badge"></i>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <a href="{% url 'remove_from_cart' item.id %}" class="item-remove">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+
+                                <div class="item-details">
+
+                                    <div class="item-price">
+                                        {% if item.product.old_price %}
+
+                                            <span class="discount-price">
+                                                ${{ item.product.price|floatformat:2 }} × {{ item.quantity }}
+                                            </span>
+
+                                            <span class="original-price">
+                                                ${{ item.product.old_price }}
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="normal-price">
+                                                ${{ item.product.price|floatformat:2 }} × {{ item.quantity }}
+                                            </span>
+
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="item-quantity">
+
+                                        <a href="{% url 'decrease_quantity' item.id %}" class="qty-btn minus">
+                                            <i class="fas fa-minus"></i>
+                                        </a>
+
+                                        <input type="number"
+                                            class="qty-input"
+                                            value="{{ item.quantity }}"
+                                            readonly>
+
+                                        <a href="{% url 'increase_quantity' item.id %}" class="qty-btn plus">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+
+                                    </div>
+
+                                    <div class="item-subtotal">
+                                        <span class="subtotal-label">Subtotal:</span>
+                                        <span class="subtotal-value">
+                                            ${{ item.subtotal|floatformat:2 }}
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        {% empty %}
+
+                        <div class="empty-cart">
+                            <h3>Your cart is empty</h3>
+                            <a href="/" class="btn-primary">Browse Products</a>
+                        </div>
+
+                        {% endfor %}
+
+                        </div>
+
+                        <!-- Empty State (Hidden by Default) -->
+                        <div class="empty-cart hidden" id="emptyCart">
+                            <div class="empty-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <h3>Your cart is empty</h3>
+                            <p>Looks like you haven't added anything to your cart yet.</p>
+                            <a href="/" class="btn-primary">Browse Products</a>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Cart Summary -->
+                    <div class="cart-summary">
+                        <h2 class="summary-title">Order Summary</h2>
+                        
+                        <div class="summary-details">
+                            <div class="summary-row">
+                                <span>Subtotal <span class="item-count" id="summaryItemCount">({{ item_count }} items)</span></span>
+                                <span class="summary-value" id="summarySubtotal">$ {{ subtotal|floatformat:2 }}</span>
+                            </div>
+                            
+                            <div class="summary-row">
+                                <span>Service Fee <span class="fee-info">(2.5%)</span></span>
+                                <span class="summary-value" id="summaryFee">$ {{ service_fee|floatformat:2 }}</span>
+                            </div>
+                            
+                            <div class="summary-row">
+                                <span>Shipping</span>
+                                <span class="summary-value shipping-free">Free</span>
+                            </div>
+                            
+                            <div class="summary-total">
+                                <span>Total</span>
+                                <span class="total-amount" id="summaryTotal">$ {{ total|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'checkout' %}" class="checkout-btn">
+                            <i class="fas fa-lock"></i>
+                            Proceed to Checkout
+                        </a>
+
+                        <div class="payment-icons">
+                            <i class="fab fa-cc-visa"></i>
+                            <i class="fab fa-cc-mastercard"></i>
+                            <i class="fab fa-cc-amex"></i>
+                            <i class="fab fa-cc-paypal"></i>
+                            <i class="fab fa-cc-apple-pay"></i>
+                        </div>
+
+                        <div class="secure-checkout">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure checkout · Protected by escrow</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Continue Shopping Link -->
+                <div class="continue-shopping">
+                    <a href="/">
+                        <i class="fas fa-arrow-left"></i>
+                        Continue Shopping
+                    </a>
+                </div>
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#">Help Center</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Shipping Info</a>
+                </div>
+                <p class="copyright">© 2026 Marketplace. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static "js/cart.js" %}"></script>
+</body>
+</html>

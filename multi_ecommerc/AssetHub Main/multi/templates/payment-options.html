@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Payment Method · Multi-Vendor Marketplace</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static "css/payment-options.css" %}">
+</head>
+<body>
+    
+
+    <!-- Main Content -->
+    <main class="payment-main">
+        <div class="container">
+            <!-- Page Title -->
+            <div class="page-header">
+                <h1 class="page-title">Choose how to pay</h1>
+                <p class="page-subtitle">Select your preferred payment method to complete the purchase</p>
+            </div>
+
+            <!-- Order Summary Card (shows what you're buying) -->
+            <div class="order-summary-card" id="orderSummary">
+                <div class="order-summary-content">
+                    <div class="order-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="order-details">
+                        {% for item in items %}
+                        <h3 id="productName">{{ item.product.name }}</h3>
+                        {% endfor %}
+                        <div class="order-meta">
+                            <span class="order-price">${{ total }}</span>
+                            <span class="order-separator">•</span>
+                            <span class="order-buyer">{{ buyer_name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Options Grid -->
+            <div class="payment-grid">
+                <!-- Option 1: WhatsApp Payment -->
+                <div class="payment-card" id="whatsappCard">
+                    <div class="card-badge popular">Most Popular</div>
+                    <div class="card-icon whatsapp-icon">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <h2 class="card-title">Contact Seller via WhatsApp</h2>
+                    <p class="card-description">
+                        You will discuss payment method and delivery directly with the seller. 
+                        Fast and personal communication.
+                    </p>
+                    
+                    <div class="card-features">
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Direct seller communication</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Negotiate price if needed</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Ask questions before paying</span>
+                        </div>
+                    </div>
+
+                    {% for chat in whatsapp_links %}
+
+                    <a href="{{ chat.link }}" target="_blank" class="payment-btn whatsapp-btn">
+                        <i class="fab fa-whatsapp"></i>
+                        Chat {{ chat.seller }} on WhatsApp
+                    </a>
+
+                    {% endfor %}
+
+                    <div class="card-note">
+                        <i class="fas fa-info-circle"></i>
+                        You'll be redirected to WhatsApp
+                    </div>
+                </div>
+
+                <!-- Option 2: Secure P2P Payment -->
+                <div class="payment-card featured" id="secureCard">
+                    <div class="card-badge secure">Most Secure</div>
+                    <div class="card-icon secure-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h2 class="card-title">Secure Escrow Payment</h2>
+                    <p class="card-description">
+                        Your payment will be held securely by the platform. 
+                        The seller receives funds only after you confirm delivery.
+                    </p>
+                    
+                    <div class="card-features">
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>100% buyer protection</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>14-day inspection period</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Free returns if item not as described</span>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'secure_payment' %}" class="payment-btn secure-btn">
+                        <i class="fas fa-lock"></i>
+                        Proceed to Secure Payment
+                    </a>
+
+                    <div class="card-note">
+                        <i class="fas fa-clock"></i>
+                        Funds held in escrow until confirmation
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </main>
+
+    
+
+    <!-- JavaScript for WhatsApp link generation -->
+    {% comment %} <script src="{% static "js/payment-options.js" %}"></script> {% endcomment %}
+</body>
+</html>

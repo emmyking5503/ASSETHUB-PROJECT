@@ -1,0 +1,77 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Transactions - Super Admin{% endblock %}
+{% block transactions_active %}active{% endblock %}
+
+{% block content %}
+<div class="users-table-container">
+    <div class="section-header">
+        <div>
+            <h2>Transactions</h2>
+            <p>Review every order item and escrow transaction.</p>
+        </div>
+        <form method="get" class="filter-form">
+            <input type="text" name="search" placeholder="Search order, buyer, seller" value="{{ search_query }}">
+            <select name="type">
+                <option value="all" {% if type_filter == 'all' %}selected{% endif %}>All Types</option>
+                <option value="escrow" {% if type_filter == 'escrow' %}selected{% endif %}>Escrow</option>
+                <option value="whatsapp" {% if type_filter == 'whatsapp' %}selected{% endif %}>WhatsApp</option>
+            </select>
+            <select name="status">
+                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Processing" {% if status_filter == 'Processing' %}selected{% endif %}>Processing</option>
+                <option value="Shipped" {% if status_filter == 'Shipped' %}selected{% endif %}>Shipped</option>
+                <option value="Delivered" {% if status_filter == 'Delivered' %}selected{% endif %}>Delivered</option>
+                <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+                <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+            <button type="submit" class="action-btn">Filter</button>
+        </form>
+    </div>
+
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Order Item</th>
+                <th>Buyer</th>
+                <th>Seller</th>
+                <th>Product</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order_item in page_obj %}
+            <tr>
+                <td>#{{ order_item.id }}</td>
+                <td>{{ order_item.order.buyer.username }}</td>
+                <td>{{ order_item.seller.username }}</td>
+                <td>{{ order_item.product.name }}</td>
+                <td>{{ order_item.order.order_type|capfirst }}</td>
+                <td>${{ order_item.price|floatformat:2 }}</td>
+                <td>{{ order_item.status }}</td>
+                <td><a href="{% url 'admin_transaction_detail' order_item.id %}" class="action-btn">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8">No transactions found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&type={{ type_filter }}&status={{ status_filter }}"><button>◀</button></a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&type={{ type_filter }}&status={{ status_filter }}"><button>▶</button></a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

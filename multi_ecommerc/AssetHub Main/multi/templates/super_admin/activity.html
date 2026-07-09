@@ -1,0 +1,100 @@
+
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Activity Log - Super Admin{% endblock %}
+{% block activity_active %}active{% endblock %}
+
+{% block content %}
+<div class="recent-activity full-view">
+    <div class="section-header">
+        <div>
+            <h2>Activity Log</h2>
+            <p>Complete history of platform activities</p>
+        </div>
+    </div>
+
+   <div class="activity-filters">
+        <a href="?type=all" class="filter-btn {% if filter_type == 'all' %}active{% endif %}">All</a>
+        <a href="?type=user" class="filter-btn {% if filter_type == 'user' %}active{% endif %}">Users</a>
+        <a href="?type=order" class="filter-btn {% if filter_type == 'order' %}active{% endif %}">Orders</a>
+        <a href="?type=payment" class="filter-btn {% if filter_type == 'payment' %}active{% endif %}">Payments</a>
+        <a href="?type=alert" class="filter-btn {% if filter_type == 'alert' %}active{% endif %}">Alerts</a>
+    </div>
+
+   <div class="activity-list">
+    {% for activity in activities %}
+    <div class="activity-item">
+
+        <!-- ICON -->
+        <div class="activity-icon"
+            {% if activity.activity_type == 'user' %}
+                style="background-color: rgba(0,255,136,0.2); color:#00ff88;"
+            {% elif activity.activity_type == 'payment' %}
+                style="background-color: rgba(255,193,7,0.2); color:#ffc107;"
+            {% elif activity.activity_type == 'order' %}
+                style="background-color: rgba(0,136,255,0.2); color:#0088ff;"
+            {% else %}
+                style="background-color: rgba(255,0,0,0.2); color:#ff4444;"
+            {% endif %}
+        >
+            {% if activity.activity_type == 'user' %} 
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="20" y1="8" x2="20" y2="14"/>
+                <line x1="23" y1="11" x2="17" y2="11"/>
+            </svg>
+            {% elif activity.activity_type == 'payment' %} 
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            {% elif activity.activity_type == 'order' %} 
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            {% else %} ⚠
+            {% endif %}
+        </div>
+
+        <!-- CONTENT -->
+        <div class="activity-content">
+            <div class="activity-header">
+                <h4>{{ activity.title }}</h4>
+                <span class="activity-time">
+                    {{ activity.created_at|timesince }} ago
+                </span>
+            </div>
+
+            <p class="activity-description">
+                {{ activity.description }}
+            </p>
+
+            {% if activity.amount %}
+            <span class="activity-amount">
+                ${{ activity.amount }}
+            </span>
+            {% endif %}
+        </div>
+        <div class="activity-actions">
+            <form method="POST" action="{% url 'delete_activity' activity.id %}"
+                  onsubmit="return confirm('Delete this activity?');">
+                {% csrf_token %}
+                <button class="action-btn danger">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% empty %}
+        <p>No activity yet</p>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

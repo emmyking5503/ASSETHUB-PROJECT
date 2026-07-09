@@ -1,0 +1,133 @@
+{% extends "buyer/buyer_base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+    <div class="welcome-section">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem;">
+            Welcome back, {{ request.user.first_name }} 👋
+        </h2>
+        <p class="welcome-subtitle">
+            Here's what's happening with your account today.
+        </p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value">{{ total_orders }}</div>
+                <div class="stat-change positive">
+                    <i class="fa-solid fa-arrow-up"></i> {{ total_orders }} total
+                </div>
+            </div>
+            <div class="stat-icon primary">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-label">Pending Orders</div>
+                <div class="stat-value">{{ pending_orders }}</div>
+                <div class="stat-change warning">
+                    <i class="fa-solid fa-clock"></i> Awaiting delivery
+                </div>
+            </div>
+            <div class="stat-icon warning">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-label">Completed Orders</div>
+                <div class="stat-value">{{ completed_orders }}</div>
+                <div class="stat-change positive">
+                    <i class="fa-solid fa-check"></i> All delivered
+                </div>
+            </div>
+            <div class="stat-icon success">
+                <i class="fa-solid fa-check-circle"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-label">Waiting Confirm</div>
+                <div class="stat-value">{{ waiting_confirm }}</div>
+                <div class="stat-change positive">
+                    <i class="fa-solid fa-wallet"></i> Awaiting
+                </div>
+            </div>
+            <div class="stat-icon info">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <h3 class="card-title">Recent Orders</h3>
+                <p class="card-subtitle">Your last 3 orders</p>
+            </div>
+            <a href="my-orders.html" class="btn btn-secondary btn-sm">View All</a>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Seller</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in recent_orders %}
+                        <tr>
+                            <td style="font-weight: 600;">#ORD-{{ item.order.id }}</td>
+                            <td>
+                                <div class="table-product">
+                                    <img src="{% if item.product.front_image %}{{ item.product.front_image.url }}{% else %}/static/default.png{% endif %}" alt="{{ item.product.name }}">
+                                    <span>{{ item.product.name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ item.product.seller.username }}</td>
+                            <td>{{ item.order.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                {% if item.status == "Pending" %}
+                                    <span class="badge badge-pending">Pending</span>
+                                {% elif item.status == "Completed" %}
+                                    <span class="badge badge-completed">Completed</span>
+                                {% elif item.status == "Delivered" %}
+                                    <span class="badge badge-shipped">Delivered</span>
+                                {% else %}
+                                    <span class="badge badge-info">{{ item.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right; font-weight: 600;">${{ item.subtotal|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align:center;">No orders yet.</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+

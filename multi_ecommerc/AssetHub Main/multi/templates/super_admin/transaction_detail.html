@@ -1,0 +1,53 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Transaction Details - Super Admin{% endblock %}
+{% block transactions_active %}active{% endblock %}
+
+{% block content %}
+<div class="detail-panel">
+    <div class="section-header">
+        <div>
+            <h2>Transaction #{{ order_item.id }}</h2>
+            <p>{{ order.order_type|capfirst }} order details</p>
+        </div>
+        <a href="{% url 'admin_transactions' %}" class="action-btn">Back to transactions</a>
+    </div>
+
+    <div class="detail-grid">
+        <div class="detail-card">
+            <h3>Buyer Information</h3>
+            <p><strong>Name:</strong> {{ order.buyer.username }}</p>
+            <p><strong>Email:</strong> {{ order.buyer.email }}</p>
+        </div>
+        <div class="detail-card">
+            <h3>Seller Information</h3>
+            <p><strong>Name:</strong> {{ order_item.seller.username }}</p>
+            <p><strong>Email:</strong> {{ order_item.seller.email }}</p>
+        </div>
+        <div class="detail-card">
+            <h3>Product</h3>
+            <p><strong>{{ order_item.product.name }}</strong></p>
+            <p>Quantity: {{ order_item.quantity }}</p>
+            <p>Price: ${{ order_item.price|floatformat:2 }}</p>
+        </div>
+        <div class="detail-card">
+            <h3>Payment</h3>
+            <p>Subtotal: ${{ order_item.price|floatformat:2 }}</p>
+            <p>Total: ${{ order_item.price|floatformat:2 }}</p>
+        </div>
+        <div class="detail-card">
+            <h3>Escrow Status</h3>
+            <p>{{ order_item.status }}</p>
+        </div>
+        <div class="detail-card">
+            <h3>Timeline</h3>
+            <div class="timeline-row">
+                {% for step in timeline %}
+                <span {% if step == order_item.status %}class="current-step"{% endif %}>{{ step }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

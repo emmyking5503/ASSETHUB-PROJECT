@@ -1,0 +1,863 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Nebula Order · Buyer Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fb;
+            padding: 2rem 1.5rem;
+            color: #111827;
+            line-height: 1.5;
+        }
+
+        /* ─── Order Container ─── */
+        .order-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* ─── Header ─── */
+        .order-header {
+            background: #ffffff;
+            padding: 2rem 2.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .order-id-section h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .order-id-section h1 i { color: #6366f1; font-size: 1.4rem; }
+        .order-number {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            background: #e0e7ff;
+            padding: 0.35rem 0.9rem;
+            border-radius: 20px;
+            color: #4338ca;
+            font-weight: 600;
+        }
+        .order-date {
+            margin-top: 0.6rem;
+            color: #6b7280;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .order-date i { color: #9ca3af; }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1.2rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .status-badge.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .status-badge.processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .status-badge.shipped {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+        .status-badge.delivered {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-badge.cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* ─── Progress Steps ─── */
+        .order-progress {
+            background: #f9fafb;
+            padding: 1.5rem 2.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .step-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #9ca3af;
+        }
+        .step.active { color: #6366f1; }
+        .step.completed { color: #059669; }
+        .step .dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            background: #e5e7eb;
+            color: #9ca3af;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+        .step.active .dot {
+            background: #6366f1;
+            color: white;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+        }
+        .step.completed .dot {
+            background: #10b981;
+            color: white;
+        }
+        .step-line {
+            flex: 1;
+            height: 3px;
+            background: #e5e7eb;
+            margin: 0 12px;
+            max-width: 80px;
+            border-radius: 4px;
+            position: relative;
+        }
+        .step-line.completed::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 100%;
+            background: #10b981;
+            border-radius: 4px;
+        }
+
+        /* ─── Content ─── */
+        .order-content { padding: 2.5rem; }
+
+        /* ─── Two Columns ─── */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .info-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 1.6rem 1.8rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .info-card:hover {
+            border-color: #c7d2fe;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.06);
+        }
+        .info-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #111827;
+        }
+        .info-card h3 i { color: #6366f1; font-size: 1.1rem; }
+        .info-card p {
+            margin: 0.7rem 0;
+            font-size: 0.88rem;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-card p i { color: #9ca3af; width: 16px; text-align: center; }
+        .info-card p strong { color: #111827; font-weight: 600; }
+
+        /* ─── Items Table ─── */
+        .items-section { margin: 2rem 0 1.5rem; }
+        .items-section h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #111827;
+        }
+        .items-section h3 i { color: #6366f1; }
+        .order-items {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid #e5e7eb;
+        }
+        .order-items th {
+            text-align: left;
+            padding: 1rem 1.3rem;
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .order-items td {
+            padding: 1.1rem 1.3rem;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+            font-size: 0.88rem;
+            color: #374151;
+        }
+        .order-items tr:last-child td { border-bottom: none; }
+        .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .product-img {
+            width: 52px;
+            height: 52px;
+            background: #e0e7ff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #6366f1;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .product-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #111827;
+        }
+        .product-seller {
+            font-size: 0.72rem;
+            color: #9ca3af;
+            margin-top: 3px;
+        }
+        .seller-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        /* ─── Summary ─── */
+        .summary-glossy {
+            margin-top: 2rem;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            padding: 1.6rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+            font-size: 0.9rem;
+        }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-label {
+            font-weight: 500;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .summary-label i { color: #9ca3af; font-size: 0.85rem; }
+        .summary-value {
+            font-weight: 600;
+            color: #111827;
+        }
+        .summary-row.total {
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid #e5e7eb;
+            border-bottom: none;
+            font-size: 1.1rem;
+        }
+        .total .summary-label {
+            font-weight: 700;
+            color: #111827;
+            font-size: 1rem;
+        }
+        .total .summary-value {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #111827;
+        }
+        .fee-info {
+            font-size: 0.68rem;
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .highlight-text {
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* ─── Action Buttons ─── */
+        .action-buttons {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.75rem 1.6rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+            box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+        }
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+        }
+        .btn-outline {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+        }
+        .btn-outline:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        .btn-danger {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+        .btn-warning {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            color: #b45309;
+        }
+        .btn-warning:hover {
+            background: #fde68a;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ─── Dispute Alert Banner ─── */
+        .dispute-alert {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+            border: 1px solid #fde68a;
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        .dispute-alert-icon {
+            width: 40px;
+            height: 40px;
+            background: #f59e0b;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .dispute-alert-content { flex: 1; }
+        .dispute-alert-content h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 4px;
+        }
+        .dispute-alert-content p {
+            font-size: 0.82rem;
+            color: #a16207;
+            line-height: 1.5;
+        }
+        .dispute-alert-content .btn-warning {
+            margin-top: 10px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.8rem;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 991px) {
+            .two-columns { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 780px) {
+            body { padding: 1rem; }
+            .order-content { padding: 1.5rem; }
+            .order-header { padding: 1.5rem; }
+            .step-wrapper { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .step-line { display: none; }
+            .action-buttons { justify-content: stretch; }
+            .action-buttons .btn { flex: 1; justify-content: center; }
+        }
+        @media (max-width: 560px) {
+            .order-items thead { display: none; }
+            .order-items tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 14px;
+                padding: 1rem;
+            }
+            .order-items td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+                border-bottom: 1px solid #f3f4f6;
+                padding: 0.6rem 0;
+            }
+            .order-items td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                color: #6b7280;
+                letter-spacing: 0.5px;
+            }
+            .product-cell { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+
+{% block page_title %}Order #OR-{{ order.id }}{% endblock %}
+
+
+
+<div class="order-container">
+
+    <!-- HEADER -->
+    <div class="order-header">
+        <div class="order-id-section">
+            <h1><i class="fas fa-box-open"></i> Order Details</h1>
+            <div class="order-number">
+                <i class="fas fa-hashtag"></i> <strong>OR-{{ order.id }}</strong>
+            </div>
+            <div class="order-date">
+                <i class="far fa-calendar-alt"></i> {{ order.created_at|date:"F d, Y · h:i A" }}
+            </div>
+        </div>
+        <div>
+            <!-- STATUS BADGE -->
+            <div class="status-badge {% if status == 'Pending' %}pending{% elif status == 'Processing' %}processing{% elif status == 'Shipped' %}shipped{% elif status == 'Delivered' %}delivered{% elif status == 'Completed' %}completed{% elif status == 'Cancelled' %}cancelled{% else %}pending{% endif %}">
+                {% if status == 'Pending' %}
+                    <i class="fas fa-clock fa-fw"></i>
+                {% elif status == 'Processing' %}
+                    <i class="fas fa-cogs fa-fw"></i>
+                {% elif status == 'Shipped' %}
+                    <i class="fas fa-truck fa-fw"></i>
+                {% elif status == 'Delivered' %}
+                    <i class="fas fa-gift fa-fw"></i>
+                {% elif status == 'Completed' %}
+                    <i class="fas fa-check-circle fa-fw"></i>
+                {% elif status == 'Cancelled' %}
+                    <i class="fas fa-ban fa-fw"></i>
+                {% else %}
+                    <i class="fas fa-sync-alt fa-fw"></i>
+                {% endif %}
+                {{ status }}
+            </div>
+
+            <!-- DISPUTE STATUS BADGE (if active) -->
+            {% if has_active_dispute %}
+            <div class="status-badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; margin-top: 8px;">
+                <i class="fas fa-gavel fa-fw"></i>
+                {% if active_dispute.status == 'awaiting_seller' %}Awaiting Seller
+                {% elif active_dispute.status == 'under_review' %}Under Review
+                {% elif active_dispute.status == 'more_info' %}More Info Needed
+                {% elif active_dispute.status == 'return_required' %}Return Required
+                {% elif active_dispute.status == 'return_shipped' %}Return Shipped
+                {% elif active_dispute.status == 'return_received' %}Return Received
+                {% else %}{{ active_dispute.status|title }}{% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- PROGRESS STEPS -->
+    <div class="order-progress">
+        <div class="step-wrapper">
+            <div class="step {% if status == 'Pending' %}active{% else %}completed{% endif %}">
+                <span class="dot"><i class="fas fa-check"></i></span> Order placed
+            </div>
+            <div class="step-line {% if status == 'Processing' or status == 'Shipped' or status == 'Delivered' or status == 'Completed' %}completed{% endif %}"></div>
+            <div class="step {% if status == 'Processing' %}active{% elif status == 'Shipped' or status == 'Delivered' or status == 'Completed' %}completed{% endif %}">
+                <span class="dot"><i class="fas fa-cogs"></i></span> Processing
+            </div>
+            <div class="step-line {% if status == 'Shipped' or status == 'Delivered' or status == 'Completed' %}completed{% endif %}"></div>
+            <div class="step {% if status == 'Shipped' %}active{% elif status == 'Delivered' or status == 'Completed' %}completed{% endif %}">
+                <span class="dot"><i class="fas fa-truck"></i></span> Shipped
+            </div>
+            <div class="step-line {% if status == 'Delivered' or status == 'Completed' %}completed{% endif %}"></div>
+            <div class="step {% if status == 'Delivered' or status == 'Completed' %}completed active{% endif %}">
+                <span class="dot"><i class="fas fa-gift"></i></span> Delivered
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="order-content">
+
+        <!-- ACTIVE DISPUTE BANNER -->
+{% if show_dispute_banner and active_dispute %}
+<div class="dispute-alert" style="border-left: 4px solid #dc2626;">
+    <div class="dispute-alert-icon" style="background: #fef2f2; color: #dc2626;">
+        <i class="fas fa-gavel"></i>
+    </div>
+    
+    <div class="dispute-alert-content">
+        <h4 style="color: #dc2626;"><i class="fas fa-exclamation-circle"></i> Dispute Active</h4>
+        <p>
+            {% if active_dispute.status == 'awaiting_seller' %}
+                Awaiting seller's response to your dispute.
+            {% elif active_dispute.status == 'under_review' %}
+                Admin is reviewing your case.
+            {% elif active_dispute.status == 'more_info' %}
+                More information needed. Check your dispute page.
+            {% elif active_dispute.status == 'return_required' %}
+                You need to return the item. <a href="{% url 'buyer_return_tracking' active_dispute.id %}" style="color: #dc2626; text-decoration: underline;">Submit return tracking</a>
+            {% elif active_dispute.status == 'return_shipped' %}
+                Your return is in transit. Awaiting seller confirmation.
+            {% elif active_dispute.status == 'return_received' %}
+                Seller confirmed receipt. Awaiting final admin decision.
+            {% else %}
+                Your dispute is being processed.
+            {% endif %}
+        </p>
+
+        <a href="{% url 'buyer_dispute_detail' active_dispute.id %}" class="btn btn-danger">
+            <i class="fas fa-eye"></i> View Dispute #{{ active_dispute.dispute_id }}
+        </a>
+    </div>
+</div>
+
+<!-- RESOLVED DISPUTE BANNER -->
+{% elif show_resolution_banner and resolved_dispute %}
+<div class="dispute-alert" style="border-left: 4px solid #059669; background: #f0fdf4;">
+    <div class="dispute-alert-icon" style="background: #dcfce7; color: #059669;">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    
+    <div class="dispute-alert-content">
+        {% if resolved_dispute.status == 'resolved_buyer' %}
+            <h4 style="color: #059669;"><i class="fas fa-trophy"></i> Dispute Resolved — You Won</h4>
+            <p>The dispute was resolved in your favor. ₦{{ resolved_dispute.get_escrow_amount|floatformat:2 }} has been refunded to your wallet.</p>
+        {% elif resolved_dispute.status == 'resolved_seller' %}
+            <h4 style="color: #dc2626;"><i class="fas fa-times-circle"></i> Dispute Resolved — Seller Won</h4>
+            <p>The dispute was resolved in the seller's favor. Funds have been released to the seller.</p>
+        {% elif resolved_dispute.status == 'resolved_mutual' %}
+            <h4 style="color: #d97706;"><i class="fas fa-handshake"></i> Dispute Resolved — Mutual Agreement</h4>
+            <p>The dispute was resolved by mutual agreement.</p>
+        {% elif resolved_dispute.status == 'cancelled' %}
+            <h4 style="color: #6b7280;"><i class="fas fa-ban"></i> Dispute Cancelled</h4>
+            <p>This dispute was cancelled.</p>
+        {% endif %}
+
+        <a href="{% url 'buyer_dispute_detail' resolved_dispute.id %}" class="btn btn-secondary">
+            <i class="fas fa-eye"></i> View Resolution Details
+        </a>
+    </div>
+</div>
+
+<!-- NO DISPUTE — SHOW OPEN DISPUTE OPTION -->
+{% elif can_dispute %}
+<div class="dispute-alert" style="border-left: 4px solid #f59e0b;">
+    <div class="dispute-alert-icon" style="background: #fffbeb; color: #f59e0b;">
+        <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    
+    <div class="dispute-alert-content">
+        <h4><i class="fas fa-shield-alt"></i> Having an issue with this order?</h4>
+        <p>If the item you received is damaged, incorrect, or not as described, you can open a dispute.</p>
+
+        {% for item in order_items %}
+        <div class="order-product">
+            <h5>{{ item.product.name }}</h5>
+            <a href="{% url 'submit_dispute' item.id %}" class="btn btn-warning">
+                <i class="fas fa-gavel"></i> Open a Dispute
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+        <!-- TWO COLUMNS: Buyer + Shipping -->
+        <div class="two-columns">
+            <div class="info-card">
+                <h3><i class="fas fa-user"></i> Buyer Details</h3>
+                <p><i class="far fa-user"></i> <strong>{{ buyer_name|default:"N/A" }}</strong></p>
+                <p><i class="far fa-envelope"></i> {{ buyer_email|default:"N/A" }}</p>
+                <p><i class="fas fa-phone-alt"></i> {{ buyer_phone|default:"N/A" }}</p>
+            </div>
+            <div class="info-card">
+                <h3><i class="fas fa-map-marker-alt"></i> Shipping Address</h3>
+                <p><i class="fas fa-location-dot"></i> {{ shipping_address|default:"N/A" }}</p>
+                <p><i class="fas fa-sticky-note"></i> Delivery note: Leave with concierge</p>
+                <p><i class="fas fa-truck"></i> Courier: SwiftLogistics</p>
+            </div>
+        </div>
+
+        <!-- ITEMS TABLE -->
+        <div class="items-section">
+            <h3><i class="fas fa-shopping-bag"></i> Order Items</h3>
+            <table class="order-items">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Seller</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td data-label="Product">
+                            <div class="product-cell">
+                                {% if item.product.front_image.url %}
+                                <img src="{{ item.product.front_image.url }}" class="product-img" alt="product" style="object-fit: cover;">
+                                {% else %}
+                                <div class="product-img"><i class="fas fa-cube"></i></div>
+                                {% endif %}
+                                <div>
+                                    <div class="product-name">{{ item.product.name }}</div>
+                                    <div class="product-seller"><i class="fas fa-tag"></i> SKU: {{ item.product.sku|default:"NX-"|add:item.id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Seller">
+                            <span class="seller-badge"><i class="fas fa-store"></i> {{ item.seller.username }}</span>
+                        </td>
+                        <td data-label="Price">₦{{ item.price|floatformat:2 }}</td>
+                        <td data-label="Qty">x{{ item.quantity }}</td>
+                        <td data-label="Total" style="font-weight: 700; color:#111827;">₦{{ item.subtotal|floatformat:2 }}</td>
+                        <td data-label="Action">
+                            {% with dispute=item_disputes|dict_get:item.id %}
+                                {% if dispute %}
+                                    {% if dispute.status in 'resolved_buyer,resolved_seller,resolved_mutual,cancelled' %}
+                                        <!-- RESOLVED -->
+                                        <span class="badge" style="background: #dcfce7; color: #059669; padding: 4px 10px; border-radius: 6px; font-size: 12px;">
+                                            <i class="fas fa-check"></i> Resolved
+                                        </span>
+                                        <a href="{% url 'buyer_dispute_detail' dispute.id %}" class="btn btn-sm" style="background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; margin-left: 4px;">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    {% else %}
+                                        <!-- ACTIVE -->
+                                        <span class="badge" style="background: #fef2f2; color: #dc2626; padding: 4px 10px; border-radius: 6px; font-size: 12px;">
+                                            <i class="fas fa-gavel"></i> Active
+                                        </span>
+                                        <a href="{% url 'buyer_dispute_detail' dispute.id %}" class="btn btn-sm" style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; margin-left: 4px;">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    {% endif %}
+                                {% elif can_dispute %}
+                                    <a href="{% url 'submit_dispute' item.id %}" class="btn btn-sm" style="background: #fef3c7; color: #92400e; border: 1px solid #f59e0b;">
+                                        <i class="fas fa-gavel"></i> Dispute
+                                    </a>
+                                {% else %}
+                                    <span style="color: #9ca3af; font-size: 12px;">—</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" style="text-align:center; padding:2rem; color:#9ca3af;">No items found in this order</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ORDER SUMMARY -->
+        <div class="summary-glossy">
+            <div class="summary-row">
+                <span class="summary-label"><i class="fas fa-shopping-cart"></i> Subtotal</span>
+                <span class="summary-value">₦{{ subtotal|default:"0.00"|floatformat:2 }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label"><i class="fas fa-percentage"></i> Service Fee <span class="fee-info">2.5%</span></span>
+                <span class="summary-value">₦{{ tax|default:"0.00"|floatformat:2 }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label"><i class="fas fa-shipping-fast"></i> Shipping</span>
+                <span class="summary-value"><span class="highlight-text">FREE Express</span></span>
+            </div>
+            {% if order.discount %}
+            <div class="summary-row">
+                <span class="summary-label"><i class="fas fa-gift"></i> Discount</span>
+                <span class="summary-value" style="color:#059669;">-₦{{ order.discount|floatformat:2 }}</span>
+            </div>
+            {% endif %}
+            <div class="summary-row total">
+                <span class="summary-label"><i class="fas fa-coins"></i> Grand Total</span>
+                <span class="summary-value">₦{{ total|default:"0.00"|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-buttons">
+            {% if status == "Pending" and not has_active_dispute %}
+            <form method="POST" action="{% url 'cancel_order' order.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-ban"></i> Cancel Order
+                </button>
+            </form>
+            {% else %}
+            <button class="btn btn-outline" disabled>
+                <i class="fas fa-lock"></i> Cancellation Unavailable
+            </button>
+            {% endif %}
+            
+            <button class="btn btn-outline" id="trackButton">
+                <i class="fas fa-map-pin"></i> Track Package
+            </button>
+            <button class="btn btn-outline" id="supportBtn">
+                <i class="fas fa-headset"></i> Support
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Countdown timer
+    document.querySelectorAll('.countdown').forEach(el => {
+        const expiry = new Date(el.dataset.expiry).getTime();
+        
+        function update() {
+            const now = new Date().getTime();
+            const diff = expiry - now;
+            
+            if (diff <= 0) {
+                el.innerHTML = "⛔ Time Expired";
+                el.style.color = "#dc2626";
+                return;
+            }
+            
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            el.innerHTML = `${h}h ${m}m ${s}s`;
+            
+            if (h < 2) {
+                el.style.color = "#dc2626";
+            }
+        }
+        
+        update();
+        setInterval(update, 1000);
+    });
+
+    // Track button
+    const trackBtn = document.getElementById('trackButton');
+    if(trackBtn){
+        trackBtn.addEventListener('click', () => {
+            alert('📡 Tracking: Your package is on the way!\nTracking ID: ORD-{{ order.id }}');
+        });
+    }
+    
+    // Support button
+    const supportBtn = document.getElementById('supportBtn');
+    if(supportBtn){
+        supportBtn.addEventListener('click', () => {
+            window.location.href = "{% url 'contact' %}";
+        });
+    }
+})();
+</script>
+
+
+</body>
+</html>

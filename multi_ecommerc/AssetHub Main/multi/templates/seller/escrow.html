@@ -1,0 +1,164 @@
+
+
+    
+{% extends "seller/basee.html" %}
+{% load static %}
+
+{% block page_title %}Add Product{% endblock %}
+
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+    <div class="card" style="padding: 1.5rem;">
+        <p style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">Ongoing Orders</p>
+        <h3 style="font-size: 1.875rem; font-weight: 700; color: var(--gray-800);">${{ ongoing_amount|floatformat:2 }}</h3>
+        <p style="font-size: 0.75rem; color: var(--info); margin-top: 0.5rem;">
+            <i class="fa-solid fa-cart-shopping"></i> From {{ ongoing_count }} active orders
+        </p>
+    </div>
+
+    <div class="card" style="padding: 1.5rem;">
+        <p style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">Pending Payments</p>
+        <h3 style="font-size: 1.875rem; font-weight: 700; color: var(--gray-800);">${{ pending_amount|floatformat:2 }}</h3>
+        <p style="font-size: 0.75rem; color: var(--warning); margin-top: 0.5rem;">
+            <i class="fa-solid fa-clock"></i> Awaiting payment confirmation
+        </p>
+    </div>
+
+    <div class="card" style="padding: 1.5rem;">
+        <p style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">In Dispute</p>
+        <h3 style="font-size: 1.875rem; font-weight: 700; color: var(--gray-800);">${{ disputed_amount|floatformat:2 }}</h3>
+        <p style="font-size: 0.75rem; color: var(--danger); margin-top: 0.5rem;">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ disputed_count }} orders locked
+        </p>
+    </div>
+
+    <div class="card" style="padding: 1.5rem;">
+        <p style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">Total Sales</p>
+        <h3 style="font-size: 1.875rem; font-weight: 700; color: var(--gray-800);">${{ total_sales|floatformat:2 }}</h3>
+        <p style="font-size: 0.75rem; color: var(--secondary); margin-top: 0.5rem;">
+            <i class="fa-solid fa-arrow-up"></i> Completed orders
+        </p>
+    </div>
+
+    <div class="card" style="padding: 1.5rem;">
+        <p style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">Cancelled Orders</p>
+        <h3 style="font-size: 1.875rem; font-weight: 700; color: var(--gray-800);">${{ cancelled_amount|floatformat:2 }}</h3>
+        <p style="font-size: 0.75rem; color: var(--secondary); margin-top: 0.5rem;">
+            <i class="fa-solid fa-arrow-down"></i> Refunded/cancelled
+        </p>
+    </div>
+</div>
+
+<!-- Transactions Table -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Order Transactions</h3>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Dispute</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in orders %}
+                <tr>
+                    <td style="font-weight: 600;">#TXN-{{ item.id }}</td>
+                    <td>#ORD-{{ item.order.id }}</td>
+                    <td>{{ item.order.buyer.username }}</td>
+                    <td>{{ item.product.name|truncatechars:30 }}</td>
+                    <td style="font-weight: 600;">${{ item.subtotal|floatformat:2 }}</td>
+
+                    <td>
+                        {% if item.status == "Pending" %}
+                            <span class="badge badge-awaiting">Pending</span>
+                        {% elif item.status == "Processing" %}
+                            <span class="badge badge-processing">Processing</span>
+                        {% elif item.status == "Shipped" %}
+                            <span class="badge badge-processing">Shipped</span>
+                        {% elif item.status == "Delivered" %}
+                            <span class="badge badge-info">Delivered</span>
+                        {% elif item.status == "Completed" %}
+                            <span class="badge badge-completed">Completed</span>
+                        {% elif item.status == "Cancelled" %}
+                            <span class="badge badge-danger">Cancelled</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if item.active_dispute %}
+                            <span class="badge badge-danger" style="background: #fee2e2; color: #991b1b;">
+                                <i class="fa-solid fa-lock"></i> Locked
+                            </span>
+                            <div style="font-size: 11px; color: var(--gray-500); margin-top: 2px;">
+                                {{ item.active_dispute.get_status_display }}
+                            </div>
+                        {% elif item.resolved_dispute %}
+                            <span class="badge" style="background: #dcfce7; color: #166534;">
+                                <i class="fa-solid fa-check"></i> Resolved
+                            </span>
+                            <div style="font-size: 11px; color: var(--gray-500); margin-top: 2px;">
+                                {{ item.resolved_dispute.get_status_display }}
+                            </div>
+                        {% else %}
+                            <span style="color: var(--gray-400);">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td style="text-align: right;">
+                        {% if item.active_dispute %}
+                            <a href="{% url 'seller_dispute_detail' item.active_dispute.id %}">
+                                <button class="btn btn-sm btn-danger">View Dispute</button>
+                            </a>
+                        {% elif item.resolved_dispute %}
+                            <a href="{% url 'seller_dispute_detail' item.resolved_dispute.id %}">
+                                <button class="btn btn-sm btn-outline-success">View Result</button>
+                            </a>
+                        {% elif item.status == "Pending" %}
+                            <a href="{% url 'seller_order_detail' item.id %}">
+                                <button class="btn btn-sm btn-primary">Follow Up</button>
+                            </a>
+                        {% elif item.status == "Delivered" %}
+                            <span style="color: orange; font-size: 12px;">Waiting for buyer</span>
+                        {% elif item.status == "Completed" %}
+                            <i class="fa-solid fa-check" style="color: green;"></i>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px; color: var(--gray-500);">
+                        <i class="fa-solid fa-inbox" style="font-size: 24px; margin-bottom: 8px;"></i><br>
+                        No transactions found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>            
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js  %}
+    
+{% endblock %}
+
+
+
+

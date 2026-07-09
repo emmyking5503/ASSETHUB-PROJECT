@@ -1,0 +1,57 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}User Profile - Super Admin{% endblock %}
+{% block users_active %}active{% endblock %}
+
+{% block content %}
+<div class="detail-panel">
+    <div class="section-header">
+        <div>
+            <h2>User Profile</h2>
+            <p>Detailed account information and activity summary.</p>
+        </div>
+        <a href="{% url 'users' %}" class="action-btn">Back to list</a>
+    </div>
+    <div class="profile-grid">
+        <div class="profile-card">
+            <div class="profile-avatar">{{ user_obj.username|slice:":1"|upper }}</div>
+            <h3>{{ user_obj.get_full_name|default:user_obj.username }}</h3>
+            <p>{{ user_obj.email }}</p>
+            <p>{{ user_obj.phone|default:'No phone provided' }}</p>
+            <p>{{ user_obj.bio|default:'No bio available.' }}</p>
+            <p>Role: {{ user_obj.get_role_display }}</p>
+            <p>Status: {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}</p>
+            <p>Joined: {{ user_obj.date_joined|date:"Y-m-d" }}</p>
+        </div>
+        <div class="detail-card">
+            <div class="stats-row">
+                <div>
+                    <span>Total Orders</span>
+                    <strong>{{ total_orders }}</strong>
+                </div>
+                <div>
+                    <span>Total Products</span>
+                    <strong>{{ total_products }}</strong>
+                </div>
+                <div>
+                    <span>Total Sales</span>
+                    <strong>${{ total_sales|floatformat:2 }}</strong>
+                </div>
+            </div>
+            {% if user_obj.seller_profile %}
+            <div class="section-block">
+                <h4>Seller Profile</h4>
+                <p>Store: {{ user_obj.seller_profile.store_name }}</p>
+                <p>Verified: {{ user_obj.seller_profile.verified|yesno:'Yes,No' }}</p>
+            </div>
+            {% endif %}
+            <div class="section-block">
+                <h4>Actions</h4>
+                <a href="{% url 'toggle_user_status' user_obj.id %}" class="action-btn">Toggle Status</a>
+                <a href="{% url 'delete_user' user_obj.id %}" class="action-btn danger" onclick="return confirm('Delete this user?');">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

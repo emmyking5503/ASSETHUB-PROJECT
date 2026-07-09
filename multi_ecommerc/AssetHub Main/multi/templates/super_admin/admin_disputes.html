@@ -1,0 +1,946 @@
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disputes - AssetHub Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0c0c0c;
+            --bg-sidebar: #111111;
+            --bg-card: #1a1a1a;
+            --bg-card-hover: #222222;
+            --bg-input: #1e1e1e;
+            --bg-badge: #252525;
+            --border-color: #2a2a2a;
+            --border-light: #333333;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent-red: #dc2626;
+            --accent-red-hover: #b91c1c;
+            --accent-red-light: rgba(220, 38, 38, 0.15);
+            --accent-green: #22c55e;
+            --accent-green-light: rgba(34, 197, 94, 0.15);
+            --accent-blue: #3b82f6;
+            --accent-blue-light: rgba(59, 130, 246, 0.15);
+            --accent-orange: #f59e0b;
+            --accent-orange-light: rgba(245, 158, 11, 0.15);
+            --accent-purple: #8b5cf6;
+            --accent-purple-light: rgba(139, 92, 246, 0.15);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-light: rgba(6, 182, 212, 0.15);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-brand {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-red);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        .sidebar-brand-text {
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .nav-item.active {
+            background: var(--accent-red);
+            color: white;
+        }
+        .nav-item i {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--accent-red);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red-light);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .search-box {
+            position: relative;
+            width: 380px;
+        }
+        .search-box input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 10px 16px 10px 42px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .search-box input:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .topbar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .topbar-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        .topbar-btn .badge-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px 6px 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .user-profile:hover {
+            border-color: var(--border-light);
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .user-info { line-height: 1.2; }
+        .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .user-role { font-size: 11px; color: var(--text-muted); }
+
+        /* ===== PAGE CONTENT ===== */
+        .page-content {
+            padding: 28px;
+            flex: 1;
+        }
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .breadcrumb-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+        .breadcrumb-nav a:hover { color: var(--text-secondary); }
+        .breadcrumb-nav .active { color: var(--text-secondary); font-size: 13px; }
+        .breadcrumb-nav i { color: var(--text-muted); font-size: 10px; }
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        @media (max-width: 1400px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 992px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 576px) { .stats-grid { grid-template-columns: 1fr; } }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+        .stat-card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .stat-icon.red { background: var(--accent-red-light); color: var(--accent-red); }
+        .stat-icon.green { background: var(--accent-green-light); color: var(--accent-green); }
+        .stat-icon.blue { background: var(--accent-blue-light); color: var(--accent-blue); }
+        .stat-icon.orange { background: var(--accent-orange-light); color: var(--accent-orange); }
+        .stat-icon.purple { background: var(--accent-purple-light); color: var(--accent-purple); }
+        .stat-icon.cyan { background: var(--accent-cyan-light); color: var(--accent-cyan); }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .stat-change {
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .stat-change.up { color: var(--accent-green); }
+        .stat-change.down { color: var(--accent-red); }
+
+        /* ===== TABLE CARD ===== */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        .table-header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .table-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .table-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-table {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-table:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--border-light);
+        }
+        .btn-table-primary {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+        .btn-table-primary:hover {
+            background: var(--accent-red-hover);
+            border-color: var(--accent-red-hover);
+        }
+        .btn-table i { font-size: 14px; }
+
+        /* ===== TABLE ===== */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .custom-table thead th {
+            background: var(--bg-sidebar);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+        .custom-table tbody td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+        .custom-table tbody tr {
+            transition: background 0.15s ease;
+        }
+        .custom-table tbody tr:hover {
+            background: var(--bg-card-hover);
+        }
+        .custom-table tbody tr:last-child td { border-bottom: none; }
+
+        /* ===== BADGES ===== */
+        .badge-custom {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .badge-custom::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .badge-open { background: var(--accent-blue-light); color: var(--accent-blue); }
+        .badge-open::before { background: var(--accent-blue); }
+        .badge-waiting-seller { background: var(--accent-orange-light); color: var(--accent-orange); }
+        .badge-waiting-seller::before { background: var(--accent-orange); }
+        .badge-waiting-admin { background: var(--accent-purple-light); color: var(--accent-purple); }
+        .badge-waiting-admin::before { background: var(--accent-purple); }
+        .badge-approved { background: var(--accent-green-light); color: var(--accent-green); }
+        .badge-approved::before { background: var(--accent-green); }
+        .badge-rejected { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .badge-rejected::before { background: #ef4444; }
+        .badge-partial { background: var(--accent-cyan-light); color: var(--accent-cyan); }
+        .badge-partial::before { background: var(--accent-cyan); }
+        .badge-replacement { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+        .badge-replacement::before { background: #a855f7; }
+        .badge-closed { background: var(--bg-badge); color: var(--text-muted); }
+        .badge-closed::before { background: var(--text-muted); }
+
+        .badge-priority {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .priority-high { background: rgba(220, 38, 38, 0.2); color: #ef4444; }
+        .priority-medium { background: var(--accent-orange-light); color: var(--accent-orange); }
+        .priority-low { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+
+        /* ===== AVATARS ===== */
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+        .avatar-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .avatar-info { line-height: 1.2; }
+        .avatar-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+        .avatar-meta { font-size: 12px; color: var(--text-muted); }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        .action-btn:hover {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination-custom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .pagination-info {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .page-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--border-light);
+        }
+        .page-btn.active {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--bg-sidebar);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: var(--text-muted);
+        }
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .empty-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* ===== MOBILE SIDEBAR TOGGLE ===== */
+        .mobile-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: flex; }
+            .search-box { width: 100%; max-width: 300px; }
+        }
+        @media (max-width: 768px) {
+            .topbar { padding: 12px 16px; }
+            .page-content { padding: 16px; }
+            .search-box { max-width: 200px; }
+            .table-header { padding: 16px; }
+            .custom-table thead th,
+            .custom-table tbody td { padding: 12px 14px; font-size: 13px; }
+        }
+        @media (max-width: 576px) {
+            .search-box { display: none; }
+            .table-actions { width: 100%; }
+            .btn-table { flex: 1; justify-content: center; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+<script type='text/javascript' src='https://prod-chat-kimi.tos-cn-beijing.volces.com/jXAVDupsWHLA33kb4PlYQHQBhB5dE8VEJcgRNeI8Grshw1U7JOOmtHp5nWxXFDeBH1ldwIzGdVYUR3RX4xvxVKzyuf8EeKXZzrWfSQphuCbxsNFOaOOeORRMgB6cl9rKlcrQ92YBG-A04cYEji5uNeIOM1RRTlYzSnlgxzQxfq3XE6mom8SE9KoG4T34zrv-BuEkDoQLLuhReMnKFF8KHBAH0jkhrfDOv02rzFpLWfsZ0LkCHskiN_0K8RZW3YVlr4gOFpbk1Qxd79b7ko9LaHXQjWuu_kh4RrS7K_kXOLAe-MKaVcAObIyhpJ_2ocOlXzvv-9SzU2MveC85EH5BRRL799f_pLLJRu8_V8N3yI78LynVT0JEtXhrJtwrj_jX4JxE_RIYQVkZ3hK432xQnlt4PtK9Q-FpXAu8aVqb54JbWYKUJorrDzP2GRP2oh3KJCjPs6eW7ngGAT2TRpYJzPMs0Ol9AsxyAZ7k5yha5wqvO6Fzd9PrftkYylPHzPzYj3XpcMjqrS6HlKBl4GnPUcf5WNbccMBwMs-OJXfYfJL-bLutHN4sVpXB5QFu1QXvbMlmGNLGq308d8hYyeLUOVPd94xntq31T9D1wQcU2nwlubop8v9NPKtaLWC3EQvVcLkvSObeweqinOqeLQ3MOuUzdRwNphDE9D8aSfI7K5og5LEpLNsRHhZBdosUQD-TfAYftt_LutqC8XPcwmLcmaJJAJuUXJ_YAMyrLrRzVCSzN_qWyaqoAupNukfPxvV5R-o-OUQtIoqGY6g9zUDN9uLw8eRjcQ4cjbJmNP3kDUnNYz4vIN3N1lVlj5Tv5Vu2i7EDVuEBcRQTLCr8xb5CUwCyys4xWRXz17sIgFDxNZVYJLwThp5ZkFejoXDZ89UTskZFaIHzS6IRrPJrlreb-RgCtQ0yAjwTlX_jTer9ukOlD__zA-N58B14NewivNItgQK9LCszRreRZu9xV3sVi_1IxmaUD-P18Ibv3SzebUk4qHQvCk-DlWhWPJyD5YQC6sIik3jX6QsnLTwk2L6jcWpWrfgs3Nms'></script><base target="_blank">
+</head>
+<body>
+    
+
+    <!-- Main Content -->
+  
+       
+
+<!-- Page Content -->
+        <div class="page-content">
+            <nav class="breadcrumb-nav">
+                <a href="{% url 'super_admin' %}">Dashboard</a>
+                <i class="bi bi-chevron-right"></i>
+                <span class="active">Disputes</span>
+            </nav>
+
+            <h1 class="page-title">Dispute Management</h1>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Total Disputes</span>
+                        <div class="stat-icon red"><i class="bi bi-shield-exclamation"></i></div>
+                    </div>
+                    <div class="stat-value">{{ total_disputes }}</div>
+                    <div class="stat-change up"><i class="bi bi-graph-up-arrow"></i> All time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Open Cases</span>
+                        <div class="stat-icon blue"><i class="bi bi-folder2-open"></i></div>
+                    </div>
+                    <div class="stat-value">{{ open_count }}</div>
+                    <div class="stat-change up"><i class="bi bi-graph-up-arrow"></i> Awaiting action</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Waiting Seller</span>
+                        <div class="stat-icon orange"><i class="bi bi-hourglass-split"></i></div>
+                    </div>
+                    <div class="stat-value">{{ waiting_seller_count }}</div>
+                    <div class="stat-change down"><i class="bi bi-hourglass"></i> Pending response</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Waiting Admin</span>
+                        <div class="stat-icon purple"><i class="bi bi-person-check"></i></div>
+                    </div>
+                    <div class="stat-value">{{ waiting_admin_count }}</div>
+                    <div class="stat-change up"><i class="bi bi-exclamation-circle"></i> Needs review</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Resolved (Buyer)</span>
+                        <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+                    </div>
+                    <div class="stat-value">{{ resolved_buyer_count }}</div>
+                    <div class="stat-change up"><i class="bi bi-arrow-up"></i> Buyer won</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Resolved (Seller)</span>
+                        <div class="stat-icon" style="background:rgba(34,197,94,0.15);color:#16a34a;"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <div class="stat-value">{{ resolved_seller_count }}</div>
+                    <div class="stat-change up"><i class="bi bi-arrow-up"></i> Seller won</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Partial Refund</span>
+                        <div class="stat-icon cyan"><i class="bi bi-cash-stack"></i></div>
+                    </div>
+                    <div class="stat-value">{{ partial_count }}</div>
+                    <div class="stat-change up"><i class="bi bi-cash"></i> Mutual</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Closed Cases</span>
+                        <div class="stat-icon" style="background:rgba(102,102,102,0.15);color:var(--text-muted);"><i class="bi bi-lock"></i></div>
+                    </div>
+                    <div class="stat-value">{{ closed_count }}</div>
+                    <div class="stat-change up"><i class="bi bi-check-all"></i> Completed</div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="ah-card" style="margin-bottom: 24px;">
+                <div class="ah-card-body" style="padding: 16px 24px;">
+                    <form method="get" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-funnel" style="color: var(--gray-400);"></i>
+                            <span style="font-size: 13px; font-weight: 600; color: var(--gray-600);">Filter:</span>
+                        </div>
+                        
+                        <select name="status" style="padding: 8px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; color: var(--gray-700); background: #fff;">
+                            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
+                            <option value="awaiting_seller" {% if status_filter == 'awaiting_seller' %}selected{% endif %}>Awaiting Seller</option>
+                            <option value="under_review" {% if status_filter == 'under_review' %}selected{% endif %}>Under Review</option>
+                            <option value="more_info" {% if status_filter == 'more_info' %}selected{% endif %}>More Info Needed</option>
+                            <option value="resolved_buyer" {% if status_filter == 'resolved_buyer' %}selected{% endif %}>Resolved (Buyer)</option>
+                            <option value="resolved_seller" {% if status_filter == 'resolved_seller' %}selected{% endif %}>Resolved (Seller)</option>
+                            <option value="resolved_mutual" {% if status_filter == 'resolved_mutual' %}selected{% endif %}>Resolved (Mutual)</option>
+                            <option value="return_required" {% if status_filter == 'return_required' %}selected{% endif %}>Return Required</option>
+                            <option value="return_shipped" {% if status_filter == 'return_shipped' %}selected{% endif %}>Return Shipped</option>
+                            <option value="return_received" {% if status_filter == 'return_received' %}selected{% endif %}>Return Received</option>
+                            <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                        
+                        <select name="priority" style="padding: 8px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; color: var(--gray-700); background: #fff;">
+                            <option value="all" {% if priority_filter == 'all' %}selected{% endif %}>All Priorities</option>
+                            <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
+                            <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
+                            <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
+                        </select>
+                        
+                        <input type="text" name="search" value="{{ search_query }}" placeholder="Search disputes..." 
+                            style="padding: 8px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; color: var(--gray-700); min-width: 200px;">
+                        
+                        <button type="submit" style="padding: 8px 18px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                            <i class="bi bi-search"></i> Apply
+                        </button>
+                        
+                        {% if status_filter != 'all' or priority_filter != 'all' or search_query %}
+                        <a href="{% url 'admin_disputes_list' %}" style="padding: 8px 18px; background: var(--gray-100); color: var(--gray-600); border: none; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <!-- Disputes Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <div>
+                        <div class="table-title">All Disputes</div>
+                        <div class="table-subtitle">Manage and resolve buyer-seller disputes</div>
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn-table" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+                        <a href="{% url 'admin_disputes_list' %}?export=1{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="btn-table"><i class="bi bi-download"></i> Export</a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Dispute ID</th>
+                                <th>Order ID</th>
+                                <th>Buyer</th>
+                                <th>Seller</th>
+                                <th>Product</th>
+                                <th>Reason</th>
+                                <th>Escrow Status</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dispute in page_obj %}
+                            <tr>
+                                <td><span style="font-family:monospace;font-weight:600;">#{{ dispute.dispute_id }}</span></td>
+                                <td><span style="font-family:monospace;color:var(--text-secondary);">#ORD-{{ dispute.order_item.order.id }}</span></td>
+                                <td>
+                                    <div class="avatar-group">
+                                        {% if dispute.buyer.profile_image %}
+                                            <img src="{{ dispute.buyer.profile_image.url }}" class="avatar-sm" alt="">
+                                        {% else %}
+                                            <img src="https://ui-avatars.com/api/?name={{ dispute.buyer.username|urlencode }}&background=3b82f6&color=fff&size=64" class="avatar-sm" alt="">
+                                        {% endif %}
+                                        <div class="avatar-info">
+                                            <div class="avatar-name">{{ dispute.buyer.username }}</div>
+                                            <div class="avatar-meta">{{ dispute.buyer.email|default:"No email" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="avatar-group">
+                                        {% if dispute.seller.profile_image %}
+                                            <img src="{{ dispute.seller.profile_image.url }}" class="avatar-sm" alt="">
+                                        {% else %}
+                                            <img src="https://ui-avatars.com/api/?name={{ dispute.seller.username|urlencode }}&background=22c55e&color=fff&size=64" class="avatar-sm" alt="">
+                                        {% endif %}
+                                        <div class="avatar-info">
+                                            <div class="avatar-name">{{ dispute.seller.username }}</div>
+                                            <div class="avatar-meta">{{ dispute.seller.email|default:"No email" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ dispute.order_item.product.name|truncatechars:30 }}</td>
+                                <td>{{ dispute.get_reason_display }}</td>
+                                <td>
+                                    {% if dispute.status == 'resolved_buyer' or dispute.status == 'resolved_seller' or dispute.status == 'resolved_mutual' or dispute.status == 'cancelled' %}
+                                        <span class="badge-custom badge-approved"><i class="bi bi-check" style="font-size:10px;"></i> Released</span>
+                                    {% elif dispute.status == 'return_required' or dispute.status == 'return_shipped' or dispute.status == 'return_received' %}
+                                        <span class="badge-custom badge-replacement"><i class="bi bi-arrow-repeat" style="font-size:10px;"></i> Return</span>
+                                    {% else %}
+                                        <span class="badge-custom badge-waiting-admin"><i class="bi bi-lock" style="font-size:10px;"></i> Locked</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if dispute.status == 'awaiting_seller' or dispute.status == 'under_review' %}
+                                        <span class="badge-custom badge-priority priority-high">High</span>
+                                    {% elif dispute.status == 'more_info' or dispute.status == 'return_required' %}
+                                        <span class="badge-custom badge-priority priority-medium">Medium</span>
+                                    {% else %}
+                                        <span class="badge-custom badge-priority priority-low">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if dispute.status == 'awaiting_seller' %}
+                                        <span class="badge-custom badge-waiting-seller">Waiting Seller</span>
+                                    {% elif dispute.status == 'under_review' %}
+                                        <span class="badge-custom badge-waiting-admin">Under Review</span>
+                                    {% elif dispute.status == 'more_info' %}
+                                        <span class="badge-custom badge-open">More Info</span>
+                                    {% elif dispute.status == 'resolved_buyer' %}
+                                        <span class="badge-custom badge-approved">Buyer Won</span>
+                                    {% elif dispute.status == 'resolved_seller' %}
+                                        <span class="badge-custom badge-rejected">Seller Won</span>
+                                    {% elif dispute.status == 'resolved_mutual' %}
+                                        <span class="badge-custom badge-partial">Mutual</span>
+                                    {% elif dispute.status == 'return_required' %}
+                                        <span class="badge-custom badge-replacement">Return Req</span>
+                                    {% elif dispute.status == 'return_shipped' %}
+                                        <span class="badge-custom badge-waiting-admin">Return Shipped</span>
+                                    {% elif dispute.status == 'return_received' %}
+                                        <span class="badge-custom badge-approved">Return Recv'd</span>
+                                    {% elif dispute.status == 'cancelled' %}
+                                        <span class="badge-custom badge-closed">Cancelled</span>
+                                    {% else %}
+                                        <span class="badge-custom badge-open">{{ dispute.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td style="color:var(--text-secondary);font-size:13px;">{{ dispute.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="action-btns">
+                                        <a href="{% url 'admin_dispute_detail' dispute.id %}" class="action-btn" title="View Details"><i class="bi bi-eye"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="11" style="text-align: center; padding: 40px; color: var(--gray-500);">
+                                    <i class="bi bi-inbox" style="font-size: 32px; display: block; margin-bottom: 12px;"></i>
+                                    No disputes found matching your criteria.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="pagination-custom">
+                    <div class="pagination-info">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} disputes</div>
+                    <div class="pagination-nav">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if priority_filter != 'all' %}&priority={{ priority_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn"><i class="bi bi-chevron-left"></i></a>
+                        {% else %}
+                            <button class="page-btn" disabled><i class="bi bi-chevron-left"></i></button>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <button class="page-btn active">{{ num }}</button>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if priority_filter != 'all' %}&priority={{ priority_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if priority_filter != 'all' %}&priority={{ priority_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn"><i class="bi bi-chevron-right"></i></a>
+                        {% else %}
+                            <button class="page-btn" disabled><i class="bi bi-chevron-right"></i></button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>

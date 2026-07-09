@@ -1,0 +1,486 @@
+{% extends 'buyer/buyer_base.html' %}
+{% load static %}
+
+{% block page_title %}My Wallet{% endblock %}
+
+{% block content %}
+{% block extra_css %}
+<style>
+    /* Wallet Container */
+.wallet-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.wallet-header {
+    margin-bottom: 32px;
+}
+
+.wallet-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+}
+
+.wallet-header p {
+    color: var(--gray-500);
+    font-size: 15px;
+}
+
+/* Wallet Cards Grid */
+.wallet-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.wallet-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.wallet-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.wallet-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.wallet-card-label {
+    font-size: 13px;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.wallet-card-value {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+/* Wallet Sections */
+.wallet-section {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.section-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.transaction-count {
+    font-size: 13px;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* Transaction List */
+.transaction-list {
+    padding: 8px;
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-50);
+    transition: background 0.15s;
+}
+
+.transaction-item:hover {
+    background: var(--gray-50);
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.transaction-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.transaction-title {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.transaction-desc {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin-bottom: 4px;
+}
+
+.transaction-date {
+    font-size: 12px;
+    color: var(--gray-400);
+}
+
+.transaction-amount {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: monospace;
+    margin-right: 16px;
+    white-space: nowrap;
+}
+
+.transaction-status .status-badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.status-completed {
+    background: #dcfce7;
+    color: #059669;
+}
+
+/* Refund List */
+.refund-list {
+    padding: 20px;
+    display: grid;
+    gap: 16px;
+}
+
+.refund-card-item {
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    padding: 20px;
+    background: var(--gray-50);
+}
+
+.refund-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.refund-id {
+    font-weight: 700;
+    color: var(--gray-900);
+    font-size: 14px;
+}
+
+.refund-date {
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+.refund-product {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.refund-product img,
+.refund-product-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+    font-size: 20px;
+}
+
+.refund-product-name {
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.refund-product-seller {
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+.refund-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.refund-amount {
+    display: flex;
+    flex-direction: column;
+}
+
+.refund-label {
+    font-size: 12px;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.refund-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: #059669;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-400);
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.empty-state p {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+}
+
+.empty-state span {
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .wallet-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .transaction-item {
+        flex-wrap: wrap;
+    }
+    
+    .transaction-amount {
+        width: 100%;
+        text-align: right;
+        margin-top: 8px;
+    }
+}
+</style>
+{% endblock extra_css %}
+<div class="wallet-container">
+
+    <!-- HEADER -->
+    <div class="wallet-header">
+        <h1><i class="fas fa-wallet"></i> My Wallet</h1>
+        <p>Manage your balance, view refunds, and track transactions</p>
+    </div>
+
+    <!-- BALANCE CARDS -->
+    <div class="wallet-cards">
+        
+        <!-- Main Balance -->
+        <div class="wallet-card balance-card">
+            <div class="wallet-card-icon" style="background: #dbeafe; color: #1e40af;">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="wallet-card-info">
+                <div class="wallet-card-label">Available Balance</div>
+                <div class="wallet-card-value" style="color: #1e40af;">
+                    ₦{{ wallet_balance|floatformat:2 }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Refunded -->
+        <div class="wallet-card refund-card">
+            <div class="wallet-card-icon" style="background: #dcfce7; color: #059669;">
+                <i class="fas fa-undo"></i>
+            </div>
+            <div class="wallet-card-info">
+                <div class="wallet-card-label">Total Refunded</div>
+                <div class="wallet-card-value" style="color: #059669;">
+                    ₦{{ total_refunded|floatformat:2 }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Spent -->
+        <div class="wallet-card spent-card">
+            <div class="wallet-card-icon" style="background: #fef2f2; color: #dc2626;">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="wallet-card-info">
+                <div class="wallet-card-label">Total Spent</div>
+                <div class="wallet-card-value" style="color: #dc2626;">
+                    ₦{{ total_spent|floatformat:2 }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Refunds -->
+        <div class="wallet-card pending-card">
+            <div class="wallet-card-icon" style="background: #fffbeb; color: #d97706;">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="wallet-card-info">
+                <div class="wallet-card-label">Pending Refunds</div>
+                <div class="wallet-card-value" style="color: #d97706;">
+                    {{ stats.pending_refunds }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS SECTION -->
+    <div class="wallet-section">
+        <div class="section-header">
+            <h2><i class="fas fa-list-alt"></i> Recent Transactions</h2>
+            <span class="transaction-count">{{ recent_transactions|length }} transactions</span>
+        </div>
+
+        {% if recent_transactions %}
+        <div class="transaction-list">
+            {% for tx in recent_transactions %}
+            <div class="transaction-item">
+                <div class="transaction-icon" style="background: {{ tx.color }}15; color: {{ tx.color }};">
+                    <i class="fas {{ tx.icon }}"></i>
+                </div>
+                
+                <div class="transaction-details">
+                    <div class="transaction-title">{{ tx.title }}</div>
+                    <div class="transaction-desc">{{ tx.description }}</div>
+                    <div class="transaction-date">
+                        <i class="far fa-clock"></i> {{ tx.date|date:"M d, Y · h:i A" }}
+                    </div>
+                </div>
+                
+                <div class="transaction-amount" style="color: {{ tx.color }};">
+                    {% if tx.type == 'credit' %}+{% else %}-{% endif %}
+                    ₦{{ tx.amount|floatformat:2 }}
+                </div>
+                
+                <div class="transaction-status">
+                    <span class="status-badge status-completed">
+                        <i class="fas fa-check-circle"></i> {{ tx.status|title }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-receipt"></i>
+            <p>No transactions yet</p>
+            <span>Your refund and payment history will appear here</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- REFUNDS HISTORY -->
+    <div class="wallet-section">
+        <div class="section-header">
+            <h2><i class="fas fa-history"></i> Refund History</h2>
+        </div>
+
+        {% if refunds %}
+        <div class="refund-list">
+            {% for refund in refunds %}
+            <div class="refund-card-item">
+                <div class="refund-header">
+                    <div class="refund-id">
+                        <i class="fas fa-gavel"></i> Dispute #{{ refund.dispute_id }}
+                    </div>
+                    <div class="refund-date">
+                        <i class="far fa-calendar-check"></i> {{ refund.resolved_at|date:"M d, Y" }}
+                    </div>
+                </div>
+                
+                <div class="refund-product">
+                    {% if refund.order_item.product.front_image %}
+                    <img src="{{ refund.order_item.product.front_image.url }}" alt="{{ refund.order_item.product.name }}">
+                    {% else %}
+                    <div class="refund-product-placeholder"><i class="fas fa-box"></i></div>
+                    {% endif %}
+                    <div class="refund-product-info">
+                        <div class="refund-product-name">{{ refund.order_item.product.name }}</div>
+                        <div class="refund-product-seller">
+                            <i class="fas fa-store"></i> {{ refund.seller.username }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="refund-footer">
+                    <div class="refund-amount">
+                        <span class="refund-label">Refunded Amount</span>
+                        <span class="refund-value">₦{{ refund.get_escrow_amount|floatformat:2 }}</span>
+                    </div>
+                    <a href="{% url 'buyer_dispute_detail' refund.id %}" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-undo"></i>
+            <p>No refunds yet</p>
+            <span>When a dispute is resolved in your favor, refunds will appear here</span>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

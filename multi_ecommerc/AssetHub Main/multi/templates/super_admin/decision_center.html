@@ -1,0 +1,1305 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+    <title>Decision Center - AssetHub Admin</title>
+    {% block extra_css %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0c0c0c;
+            --bg-sidebar: #111111;
+            --bg-card: #1a1a1a;
+            --bg-card-hover: #222222;
+            --bg-input: #1e1e1e;
+            --bg-badge: #252525;
+            --border-color: #2a2a2a;
+            --border-light: #333333;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent-red: #dc2626;
+            --accent-red-hover: #b91c1c;
+            --accent-red-light: rgba(220, 38, 38, 0.15);
+            --accent-green: #22c55e;
+            --accent-green-light: rgba(34, 197, 94, 0.15);
+            --accent-blue: #3b82f6;
+            --accent-blue-light: rgba(59, 130, 246, 0.15);
+            --accent-orange: #f59e0b;
+            --accent-orange-light: rgba(245, 158, 11, 0.15);
+            --accent-purple: #8b5cf6;
+            --accent-purple-light: rgba(139, 92, 246, 0.15);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-light: rgba(6, 182, 212, 0.15);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-brand {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-red);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        .sidebar-brand-text {
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .nav-item.active {
+            background: var(--accent-red);
+            color: white;
+        }
+        .nav-item i {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--accent-red);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red-light);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .search-box {
+            position: relative;
+            width: 380px;
+        }
+        .search-box input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 10px 16px 10px 42px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .search-box input:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .topbar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .topbar-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        .topbar-btn .badge-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px 6px 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .user-profile:hover {
+            border-color: var(--border-light);
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .user-info { line-height: 1.2; }
+        .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .user-role { font-size: 11px; color: var(--text-muted); }
+
+        /* ===== PAGE CONTENT ===== */
+        .page-content {
+            padding: 28px;
+            flex: 1;
+        }
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .breadcrumb-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+        .breadcrumb-nav a:hover { color: var(--text-secondary); }
+        .breadcrumb-nav .active { color: var(--text-secondary); font-size: 13px; }
+        .breadcrumb-nav i { color: var(--text-muted); font-size: 10px; }
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        /* ===== CARDS ===== */
+        .detail-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .detail-card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .detail-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .detail-card-title i { color: var(--accent-red); font-size: 18px; }
+        .detail-card-body {
+            padding: 20px 24px;
+        }
+
+        /* ===== SUMMARY BAR ===== */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 1200px) { .summary-bar { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .summary-bar { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 576px) { .summary-bar { grid-template-columns: 1fr; } }
+
+        .summary-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .summary-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .summary-icon.buyer { background: var(--accent-blue-light); color: var(--accent-blue); }
+        .summary-icon.seller { background: var(--accent-green-light); color: var(--accent-green); }
+        .summary-icon.product { background: var(--accent-purple-light); color: var(--accent-purple); }
+        .summary-icon.escrow { background: var(--accent-orange-light); color: var(--accent-orange); }
+        .summary-icon.status { background: var(--accent-red-light); color: var(--accent-red); }
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .summary-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ===== EVIDENCE SUMMARY ===== */
+        .evidence-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 992px) { .evidence-summary-grid { grid-template-columns: 1fr; } }
+
+        .evidence-party {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+        .evidence-party-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .evidence-party-header img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .evidence-party-header h6 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .evidence-party-header span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .evidence-counts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .evidence-count-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+        }
+        .evidence-count-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .evidence-count-label i { font-size: 14px; }
+        .evidence-count-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ===== CHECKLIST ===== */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .checklist-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .checklist-item:first-child { padding-top: 0; }
+        .checklist-box {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            font-size: 12px;
+            color: transparent;
+        }
+        .checklist-box:hover { border-color: var(--accent-red); }
+        .checklist-box.checked {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+        .checklist-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+        .checklist-text.checked {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+        .checklist-note {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-label-custom {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .form-input-custom {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 11px 14px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .form-input-custom:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        .form-input-custom::placeholder { color: var(--text-muted); }
+        select.form-input-custom {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+        textarea.form-input-custom {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* ===== RESOLUTION PREVIEW ===== */
+        .resolution-preview {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+        .resolution-preview-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .resolution-preview-header i {
+            font-size: 20px;
+            color: var(--accent-orange);
+        }
+        .resolution-preview-header h6 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .resolution-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .resolution-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .resolution-list li i {
+            color: var(--accent-green);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        /* ===== NOTIFICATION OPTIONS ===== */
+        .notification-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 576px) { .notification-grid { grid-template-columns: 1fr; } }
+
+        .notification-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .notification-option:hover {
+            border-color: var(--border-light);
+        }
+        .notification-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-red);
+            cursor: pointer;
+        }
+        .notification-option label {
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+        }
+        .notification-option .note {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ===== SUBMIT BUTTON ===== */
+        .submit-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 16px 28px;
+            background: var(--accent-red);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 14px;
+        }
+        .btn-submit:hover {
+            background: var(--accent-red-hover);
+            box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+        }
+        .btn-submit i { font-size: 20px; }
+        .submit-warning {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .submit-warning i { color: var(--accent-orange); font-size: 14px; }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-btn-lg {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .action-btn-lg:hover {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+        .action-btn-lg i { font-size: 15px; }
+
+        /* ===== ALERT ===== */
+        .alert-custom {
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .alert-warning {
+            background: var(--accent-orange-light);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--accent-orange);
+        }
+        .alert-warning i { font-size: 18px; }
+
+        /* ===== MOBILE ===== */
+        .mobile-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: flex; }
+            .search-box { width: 100%; max-width: 300px; }
+        }
+        @media (max-width: 768px) {
+            .topbar { padding: 12px 16px; }
+            .page-content { padding: 16px; }
+            .search-box { max-width: 200px; }
+            .detail-card-header { padding: 16px; }
+            .detail-card-body { padding: 16px; }
+            .evidence-counts { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 576px) {
+            .search-box { display: none; }
+            .notification-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+    {% endblock extra_css %}
+
+
+{% block content %}
+<div class="page-content">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+        <a href="{% url 'super_admin' %}">Dashboard</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'admin_disputes_list' %}">Disputes</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'admin_dispute_detail' dispute.id %}">#{{ dispute.dispute_id }}</a>
+        <i class="bi bi-chevron-right"></i>
+        <span class="active">Decision Center</span>
+    </nav>
+    
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <h1 class="page-title mb-0">Decision Center</h1>
+        <div class="d-flex gap-2">
+            <a href="{% url 'admin_dispute_detail' dispute.id %}" class="action-btn-lg" style="padding:8px 16px;font-size:13px;">
+                <i class="bi bi-arrow-left"></i> Back to Case
+            </a>
+            <a href="{% url 'admin_evidence_center' dispute.id %}" class="action-btn-lg" style="padding:8px 16px;font-size:13px;">
+                <i class="bi bi-folder"></i> Evidence Center
+            </a>
+        </div>
+    </div>
+
+    <!-- Warning Alert -->
+    <div class="alert-custom alert-warning mb-4" style="background:#fffbeb;border:1px solid #f59e0b;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px;">
+        <i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b;font-size:20px;"></i>
+        <span style="color:#92400e;font-size:14px;">This decision is final and cannot be undone. Please review all evidence and checklist items before submitting.</span>
+    </div>
+
+    <!-- Top Summary -->
+    <div class="summary-bar mb-4" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+        <div class="summary-item" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;">
+            <div class="summary-icon buyer" style="width:40px;height:40px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-person" style="color:#3b82f6;"></i>
+            </div>
+            <div>
+                <div class="summary-label" style="font-size:12px;color:var(--text-muted);">Buyer</div>
+                <div class="summary-value" style="font-size:14px;font-weight:600;">{{ buyer.username }}</div>
+            </div>
+        </div>
+        <div class="summary-item" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;">
+            <div class="summary-icon seller" style="width:40px;height:40px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-shop" style="color:#22c55e;"></i>
+            </div>
+            <div>
+                <div class="summary-label" style="font-size:12px;color:var(--text-muted);">Seller</div>
+                <div class="summary-value" style="font-size:14px;font-weight:600;">{{ seller.username }}</div>
+            </div>
+        </div>
+        <div class="summary-item" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;">
+            <div class="summary-icon product" style="width:40px;height:40px;border-radius:10px;background:#f3e8ff;display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-box-seam" style="color:#a855f7;"></i>
+            </div>
+            <div>
+                <div class="summary-label" style="font-size:12px;color:var(--text-muted);">Product</div>
+                <div class="summary-value" style="font-size:14px;font-weight:600;">{{ product.name|truncatechars:20 }}</div>
+            </div>
+        </div>
+        <div class="summary-item" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;">
+            <div class="summary-icon escrow" style="width:40px;height:40px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-cash-stack" style="color:#16a34a;"></i>
+            </div>
+            <div>
+                <div class="summary-label" style="font-size:12px;color:var(--text-muted);">Escrow Amount</div>
+                <div class="summary-value" style="font-size:14px;font-weight:600;">${{ escrow_amount }}</div>
+            </div>
+        </div>
+        <div class="summary-item" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;">
+            <div class="summary-icon status" style="width:40px;height:40px;border-radius:10px;background:#fee2e2;display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-exclamation-circle" style="color:#dc2626;"></i>
+            </div>
+            <div>
+                <div class="summary-label" style="font-size:12px;color:var(--text-muted);">Dispute Reason</div>
+                <div class="summary-value" style="font-size:14px;font-weight:600;">{{ dispute.get_reason_display }}</div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'admin_decision_center' dispute.id %}" id="decisionForm">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-xl-8 col-lg-7">
+                
+                <!-- Evidence Summary -->
+                <div class="detail-card mb-4">
+                    <div class="detail-card-header d-flex justify-content-between align-items-center">
+                        <div class="detail-card-title"><i class="bi bi-folder"></i> Evidence Summary</div>
+                        <a href="{% url 'admin_evidence_center' dispute.id %}" class="action-btn-lg" style="font-size:12px;padding:6px 14px;">
+                            <i class="bi bi-eye"></i> View All Evidence
+                        </a>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="evidence-summary-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <!-- Buyer Evidence -->
+                            <div class="evidence-party" style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:12px;padding:20px;">
+                                <div class="evidence-party-header" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                                    <img src="https://ui-avatars.com/api/?name={{ buyer.first_name|default:buyer.username }}+{{ buyer.last_name }}&background=3b82f6&color=fff&size=64" 
+                                         alt="" style="width:40px;height:40px;border-radius:50%;">
+                                    <div>
+                                        <h6 style="margin:0;font-size:14px;font-weight:600;">Buyer Evidence</h6>
+                                        <span style="font-size:12px;color:var(--text-muted);">{{ buyer.username }}</span>
+                                    </div>
+                                </div>
+                                <div class="evidence-counts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                    <div class="evidence-count-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card);border-radius:8px;">
+                                        <span style="font-size:12px;"><i class="bi bi-image" style="color:var(--accent-purple);margin-right:6px;"></i> Images</span>
+                                        <span style="font-weight:600;">{{ evidence_summary.buyer.images }}</span>
+                                    </div>
+                                    <div class="evidence-count-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card);border-radius:8px;">
+                                        <span style="font-size:12px;"><i class="bi bi-camera-video" style="color:var(--accent-red);margin-right:6px;"></i> Videos</span>
+                                        <span style="font-weight:600;">{{ evidence_summary.buyer.videos }}</span>
+                                    </div>
+                                    <div class="evidence-count-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card);border-radius:8px;">
+                                        <span style="font-size:12px;"><i class="bi bi-file-earmark-text" style="color:var(--accent-orange);margin-right:6px;"></i> Documents</span>
+                                        <span style="font-weight:600;">{{ evidence_summary.buyer.documents }}</span>
+                                    </div>
+                                    <div class="evidence-count-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card);border-radius:8px;">
+                                        <span style="font-size:12px;"><i class="bi bi-receipt" style="color:var(--accent-green);margin-right:6px;"></i> Receipts</span>
+                                        <span style="font-weight:600;">{{ evidence_summary.buyer.receipts }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Seller Evidence -->
+                            <div class="evidence-party" style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:12px;padding:20px;">
+                                <div class="evidence-party-header" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                                    <img src="https://ui-avatars.com/api/?name={{ seller.first_name|default:seller.username }}+{{ seller.last_name }}&background=22c55e&color=fff&size=64" 
+                                         alt="" style="width:40px;height:40px;border-radius:50%;">
+                                    <div>
+                                        <h6 style="margin:0;font-size:14px;font-weight:600;">Seller Evidence</h6>
+                                        <span style="font-size:12px;color:var(--text-muted);">{{ seller.username }}</span>
+                                    </div>
+                                </div>
+                                <div class="evidence-counts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                    <div class="evidence-count-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card);border-radius:8px;">
+                                        <span style="font-size:12px;"><i class="bi bi-image" style="color:var(--accent-purple);margin-right:6px;"></i> Images</span>
+                                        <span style="font-weight:600;">{{ evidence_summary.seller.images }}</span>
+                                    </div>
+                                    <div class="evidence-count-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card);border-radius:8px;">
+                                        <span style="font-size:12px;"><i class="bi bi-truck" style="color:var(--accent-blue);margin-right:6px;"></i> Courier</span>
+                                        <span style="font-weight:600;">{{ evidence_summary.seller.courier }}</span>
+                                    </div>
+                                    <div class="evidence-count-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card);border-radius:8px;">
+                                        <span style="font-size:12px;"><i class="bi bi-upc-scan" style="color:var(--accent-cyan);margin-right:6px;"></i> Tracking</span>
+                                        <span style="font-weight:600;">{{ evidence_summary.seller.tracking }}</span>
+                                    </div>
+                                    <div class="evidence-count-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card);border-radius:8px;">
+                                        <span style="font-size:12px;"><i class="bi bi-file-earmark-text" style="color:var(--accent-orange);margin-right:6px;"></i> Documents</span>
+                                        <span style="font-weight:600;">{{ evidence_summary.seller.documents }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Review Checklist -->
+                <div class="detail-card mb-4">
+                    <div class="detail-card-header d-flex justify-content-between align-items-center">
+                        <div class="detail-card-title"><i class="bi bi-check2-square"></i> Admin Review Checklist</div>
+                        <span style="font-size:13px;color:var(--text-muted);"><span id="checklistCount">0</span> of 8 completed</span>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="checklist-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                            <div class="checklist-box" onclick="toggleCheck(this)" style="width:24px;height:24px;border:2px solid var(--border-color);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+                                <i class="bi bi-check" style="display:none;color:#fff;font-size:14px;"></i>
+                            </div>
+                            <span class="checklist-text" style="flex:1;font-size:14px;">Buyer Evidence Reviewed</span>
+                            <span class="checklist-note" style="font-size:12px;color:var(--text-muted);">{{ evidence_summary.buyer.total }} files</span>
+                        </div>
+                        <div class="checklist-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                            <div class="checklist-box" onclick="toggleCheck(this)" style="width:24px;height:24px;border:2px solid var(--border-color);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+                                <i class="bi bi-check" style="display:none;color:#fff;font-size:14px;"></i>
+                            </div>
+                            <span class="checklist-text" style="flex:1;font-size:14px;">Seller Evidence Reviewed</span>
+                            <span class="checklist-note" style="font-size:12px;color:var(--text-muted);">{{ evidence_summary.seller.total }} files</span>
+                        </div>
+                        <div class="checklist-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                            <div class="checklist-box" onclick="toggleCheck(this)" style="width:24px;height:24px;border:2px solid var(--border-color);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+                                <i class="bi bi-check" style="display:none;color:#fff;font-size:14px;"></i>
+                            </div>
+                            <span class="checklist-text" style="flex:1;font-size:14px;">Tracking Verified</span>
+                            <span class="checklist-note" style="font-size:12px;color:var(--text-muted);">
+                                {% if dispute.seller_tracking %}{{ dispute.seller_courier }} {{ dispute.seller_tracking }}{% else %}N/A{% endif %}
+                            </span>
+                        </div>
+                        <div class="checklist-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                            <div class="checklist-box" onclick="toggleCheck(this)" style="width:24px;height:24px;border:2px solid var(--border-color);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+                                <i class="bi bi-check" style="display:none;color:#fff;font-size:14px;"></i>
+                            </div>
+                            <span class="checklist-text" style="flex:1;font-size:14px;">Escrow Verified</span>
+                            <span class="checklist-note" style="font-size:12px;color:var(--text-muted);">${{ escrow_amount }} locked</span>
+                        </div>
+                        <div class="checklist-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                            <div class="checklist-box" onclick="toggleCheck(this)" style="width:24px;height:24px;border:2px solid var(--border-color);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+                                <i class="bi bi-check" style="display:none;color:#fff;font-size:14px;"></i>
+                            </div>
+                            <span class="checklist-text" style="flex:1;font-size:14px;">Product Details Verified</span>
+                            <span class="checklist-note" style="font-size:12px;color:var(--text-muted);">{{ product.name|truncatechars:25 }}</span>
+                        </div>
+                        <div class="checklist-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                            <div class="checklist-box" onclick="toggleCheck(this)" style="width:24px;height:24px;border:2px solid var(--border-color);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+                                <i class="bi bi-check" style="display:none;color:#fff;font-size:14px;"></i>
+                            </div>
+                            <span class="checklist-text" style="flex:1;font-size:14px;">Return Confirmed (if applicable)</span>
+                            <span class="checklist-note" style="font-size:12px;color:var(--text-muted);">
+                                {% if dispute.return_received_at %}Received {{ dispute.return_received_at|date:"M j, Y" }}{% else %}Pending{% endif %}
+                            </span>
+                        </div>
+                        <div class="checklist-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                            <div class="checklist-box" onclick="toggleCheck(this)" style="width:24px;height:24px;border:2px solid var(--border-color);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+                                <i class="bi bi-check" style="display:none;color:#fff;font-size:14px;"></i>
+                            </div>
+                            <span class="checklist-text" style="flex:1;font-size:14px;">Fraud Check Completed</span>
+                            <span class="checklist-note" style="font-size:12px;color:var(--text-muted);">No flags found</span>
+                        </div>
+                        <div class="checklist-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;">
+                            <div class="checklist-box" onclick="toggleCheck(this)" style="width:24px;height:24px;border:2px solid var(--border-color);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+                                <i class="bi bi-check" style="display:none;color:#fff;font-size:14px;"></i>
+                            </div>
+                            <span class="checklist-text" style="flex:1;font-size:14px;">Internal Notes Added</span>
+                            <span class="checklist-note" style="font-size:12px;color:var(--text-muted);">Required</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decision Form -->
+                <div class="detail-card mb-4">
+                    <div class="detail-card-header">
+                        <div class="detail-card-title"><i class="bi bi-gavel"></i> Decision Form</div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label-custom" style="display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Decision Type</label>
+                                <select name="decision_type" class="form-input-custom" id="decisionType" onchange="updatePreview()" 
+                                        style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);font-size:14px;" required>
+                                    <option value="">Select a decision...</option>
+                                    <option value="resolved_buyer">Approve — Full Refund to Buyer</option>
+                                    <option value="resolved_seller">Reject — Release Funds to Seller</option>
+                                    <option value="resolved_mutual">Partial Refund (Mutual)</option>
+                                    <option value="return_required">Return & Refund</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom" style="display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Refund Amount</label>
+                                <div style="position:relative;">
+                                    <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);">$</span>
+                                    <input type="number" name="refund_amount" class="form-input-custom" id="refundAmount" 
+                                           placeholder="0.00" value="{{ escrow_amount }}" step="0.01" max="{{ escrow_amount }}"
+                                           style="width:100%;padding:10px 14px 10px 28px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);font-size:14px;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom" style="display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Return Required</label>
+                                <select name="return_required" class="form-input-custom" id="returnRequired" onchange="updatePreview()"
+                                        style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);font-size:14px;">
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes — Buyer must return item</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-custom" style="display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Internal Notes (Admin Only)</label>
+                                <textarea name="internal_notes" class="form-input-custom" rows="3" 
+                                          placeholder="Enter internal notes about this decision..."
+                                          style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);font-size:14px;resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-custom" style="display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">
+                                    Public Decision Explanation <span style="color:var(--text-muted);font-weight:400;">(Visible to Both Parties)</span>
+                                </label>
+                                <textarea name="public_explanation" class="form-input-custom" rows="3" 
+                                          placeholder="Enter the explanation that will be sent to both buyer and seller..."
+                                          style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);font-size:14px;resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Options -->
+                <div class="detail-card mb-4">
+                    <div class="detail-card-header">
+                        <div class="detail-card-title"><i class="bi bi-bell"></i> Notification Options</div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="notification-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+                            <div class="notification-option" style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;">
+                                <input type="checkbox" name="notify_buyer" id="notify-buyer" checked style="margin-top:3px;">
+                                <div>
+                                    <label for="notify-buyer" style="font-size:14px;font-weight:600;color:var(--text-primary);cursor:pointer;">Notify Buyer</label>
+                                    <div class="note" style="font-size:12px;color:var(--text-muted);">Send in-app to {{ buyer.username }}</div>
+                                </div>
+                            </div>
+                            <div class="notification-option" style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;">
+                                <input type="checkbox" name="notify_seller" id="notify-seller" checked style="margin-top:3px;">
+                                <div>
+                                    <label for="notify-seller" style="font-size:14px;font-weight:600;color:var(--text-primary);cursor:pointer;">Notify Seller</label>
+                                    <div class="note" style="font-size:12px;color:var(--text-muted);">Send in-app to {{ seller.username }}</div>
+                                </div>
+                            </div>
+                            <div class="notification-option" style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;">
+                                <input type="checkbox" name="send_email" id="send-email" checked style="margin-top:3px;">
+                                <div>
+                                    <label for="send-email" style="font-size:14px;font-weight:600;color:var(--text-primary);cursor:pointer;">Send Email</label>
+                                    <div class="note" style="font-size:12px;color:var(--text-muted);">Email both parties</div>
+                                </div>
+                            </div>
+                            <div class="notification-option" style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;">
+                                <input type="checkbox" id="send-push" checked style="margin-top:3px;">
+                                <div>
+                                    <label for="send-push" style="font-size:14px;font-weight:600;color:var(--text-primary);cursor:pointer;">Push Notification</label>
+                                    <div class="note" style="font-size:12px;color:var(--text-muted);">Browser push alerts</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resolution Preview -->
+                <div class="detail-card mb-4">
+                    <div class="detail-card-header">
+                        <div class="detail-card-title"><i class="bi bi-lightbulb"></i> Resolution Preview</div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="resolution-preview" style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:12px;padding:20px;">
+                            <div class="resolution-preview-header" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                                <i class="bi bi-info-circle" style="color:var(--accent-blue);font-size:20px;"></i>
+                                <h6 style="margin:0;font-size:14px;font-weight:600;">What will happen if you submit this decision:</h6>
+                            </div>
+                            <ul class="resolution-list" id="resolutionList" style="list-style:none;padding:0;margin:0;">
+                                <li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                                    <span>Escrow will release <strong>${{ escrow_amount }}</strong> based on the decision</span>
+                                </li>
+                                <li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                                    <span>Buyer and seller will be notified immediately</span>
+                                </li>
+                                <li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                                    <span>Case will be marked as <strong>Closed</strong> and archived</span>
+                                </li>
+                                <li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                                    <span>Transaction will be logged for audit purposes</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Decision -->
+                <div class="submit-section mb-4" style="text-align:center;padding:24px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;">
+                    <button type="submit" class="btn-submit" id="submitBtn" 
+                            style="background:var(--accent-red);color:#fff;border:none;padding:14px 32px;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all 0.2s;"
+                            onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                        <i class="bi bi-gavel"></i>
+                        Submit Final Decision
+                    </button>
+                    <div class="submit-warning" style="display:flex;align-items:center;gap:8px;margin-top:12px;color:var(--text-muted);font-size:13px;">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>This action is irreversible. The decision will be immediately enforced and both parties will be notified.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Sidebar -->
+            <div class="col-xl-4 col-lg-5">
+                <div style="position:sticky;top:20px;">
+                    <!-- Case Overview -->
+                    <div class="detail-card mb-3">
+                        <div class="detail-card-header">
+                            <div class="detail-card-title"><i class="bi bi-info-circle"></i> Case Overview</div>
+                        </div>
+                        <div class="detail-card-body">
+                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Status</span>
+                                <span style="font-size:14px;font-weight:600;color:var(--accent-purple);"><i class="bi bi-eye"></i> {{ dispute.get_status_display }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Priority</span>
+                                <span style="font-size:14px;font-weight:600;color:var(--accent-red);"><i class="bi bi-exclamation-triangle"></i> High</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Escrow Amount</span>
+                                <span style="font-size:14px;font-weight:600;color:var(--accent-green);">${{ escrow_amount }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Buyer</span>
+                                <span style="font-size:14px;font-weight:600;">{{ buyer.username }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Seller</span>
+                                <span style="font-size:14px;font-weight:600;">{{ seller.username }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Product Value</span>
+                                <span style="font-size:14px;font-weight:600;">${{ order_item.price }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Assigned Admin</span>
+                                <span style="font-size:14px;font-weight:600;">{{ request.user.username }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:10px 0;">
+                                <span style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Deadline</span>
+                                <span style="font-size:14px;font-weight:600;color:var(--accent-orange);">{{ resolution_deadline|date:"M j, Y" }} ({{ days_to_resolution }} days)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="detail-card mb-3">
+                        <div class="detail-card-header">
+                            <div class="detail-card-title"><i class="bi bi-bar-chart"></i> Evidence Stats</div>
+                        </div>
+                        <div class="detail-card-body">
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:13px;color:var(--text-secondary);">Total Evidence Files</span>
+                                <span style="font-size:16px;font-weight:700;">{{ evidence_summary.buyer.total|add:evidence_summary.seller.total }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:13px;color:var(--text-secondary);">Buyer Evidence</span>
+                                <span style="font-size:16px;font-weight:700;color:var(--accent-blue);">{{ evidence_summary.buyer.total }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="font-size:13px;color:var(--text-secondary);">Seller Evidence</span>
+                                <span style="font-size:16px;font-weight:700;color:var(--accent-green);">{{ evidence_summary.seller.total }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+                                <span style="font-size:13px;color:var(--text-secondary);">System Documents</span>
+                                <span style="font-size:16px;font-weight:700;color:var(--text-muted);">{{ dispute.messages.filter.count|default:"0" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Checklist toggle
+    function toggleCheck(box) {
+        const check = box.querySelector('i');
+        const text = box.nextElementSibling;
+        
+        if (box.classList.contains('checked')) {
+            box.classList.remove('checked');
+            box.style.background = 'transparent';
+            box.style.borderColor = 'var(--border-color)';
+            check.style.display = 'none';
+            text.style.textDecoration = 'none';
+            text.style.color = 'var(--text-primary)';
+        } else {
+            box.classList.add('checked');
+            box.style.background = 'var(--accent-green)';
+            box.style.borderColor = 'var(--accent-green)';
+            check.style.display = 'block';
+            text.style.textDecoration = 'line-through';
+            text.style.color = 'var(--text-muted)';
+        }
+        updateChecklistCount();
+    }
+
+    function updateChecklistCount() {
+        const checked = document.querySelectorAll('.checklist-box.checked').length;
+        document.getElementById('checklistCount').textContent = checked;
+    }
+
+    // Resolution preview updates based on decision
+    function updatePreview() {
+        const decision = document.getElementById('decisionType').value;
+        const returnReq = document.getElementById('returnRequired').value;
+        const refundAmt = document.getElementById('refundAmount').value || '{{ escrow_amount }}';
+        const list = document.getElementById('resolutionList');
+        
+        let items = [];
+        
+        if (decision === 'resolved_buyer') {
+            items = [
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Buyer will receive <strong>$${refundAmt}</strong> refund to their wallet</span>
+                </li>`,
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Seller will lose the escrowed funds</span>
+                </li>`,
+                returnReq === 'yes' ? 
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-orange);"></i>
+                    <span><strong>Buyer must return the item</strong> before refund is finalized</span>
+                </li>` : '',
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Case will be marked as <strong>Resolved (Buyer Won)</strong></span>
+                </li>`
+            ];
+        } else if (decision === 'resolved_seller') {
+            items = [
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Seller will receive <strong>$${refundAmt}</strong> released to their wallet</span>
+                </li>`,
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Order will be marked as <strong>Completed</strong></span>
+                </li>`,
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Case will be marked as <strong>Resolved (Seller Won)</strong></span>
+                </li>`
+            ];
+        } else if (decision === 'resolved_mutual') {
+            items = [
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Funds will be split: <strong>$${(parseFloat(refundAmt)/2).toFixed(2)}</strong> to each party</span>
+                </li>`,
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Case will be marked as <strong>Resolved (Mutual)</strong></span>
+                </li>`
+            ];
+        } else if (decision === 'return_required') {
+            items = [
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-orange);"></i>
+                    <span><strong>Buyer has 7 days</strong> to return the item with tracking</span>
+                </li>`,
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-orange);"></i>
+                    <span>Refund of <strong>$${refundAmt}</strong> will be processed after return is confirmed</span>
+                </li>`,
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Case status: <strong>Return Required</strong></span>
+                </li>`
+            ];
+        } else {
+            items = [
+                `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                    <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                    <span>Select a decision type to see the resolution preview</span>
+                </li>`
+            ];
+        }
+        
+        // Always add these
+        items.push(
+            `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                <span>Both parties will be notified immediately</span>
+            </li>`,
+            `<li style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-secondary);font-size:14px;">
+                <i class="bi bi-check-circle" style="color:var(--accent-green);"></i>
+                <span>Transaction will be logged for audit purposes</span>
+            </li>`
+        );
+        
+        list.innerHTML = items.join('');
+    }
+
+    // Form validation before submit
+    document.getElementById('decisionForm').addEventListener('submit', function(e) {
+        const decision = document.getElementById('decisionType').value;
+        if (!decision) {
+            e.preventDefault();
+            alert('Please select a decision type.');
+            return false;
+        }
+        
+        const checked = document.querySelectorAll('.checklist-box.checked').length;
+        if (checked < 4) {
+            if (!confirm('You have only checked ' + checked + ' of 8 checklist items. Are you sure you want to submit?')) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        return confirm('This decision is FINAL and cannot be undone. Are you absolutely sure?');
+    });
+
+    // Initialize
+    updateChecklistCount();
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

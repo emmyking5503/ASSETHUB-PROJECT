@@ -1,0 +1,276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EscrowFlow · Join the marketplace</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static "css/register.css" %}">
+</head>
+<body>
+    <div class="split-layout">
+        <!-- Left Side - Marketplace Showcase with Flying Products -->
+        <div class="showcase-side">
+            <!-- Floating Products Animation -->
+            <div class="floating-products">
+                <div class="floating-product product-1">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&auto=format" alt="Nike Sneakers">
+                    <div class="product-tag">$249</div>
+                </div>
+                <div class="floating-product product-2">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format" alt="Smart Watch">
+                    <div class="product-tag">$399</div>
+                </div>
+                <div class="floating-product product-3">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&auto=format" alt="Headphones">
+                    <div class="product-tag">$159</div>
+                </div>
+                <div class="floating-product product-4">
+                    <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=200&auto=format" alt="Camera">
+                    <div class="product-tag">$899</div>
+                </div>
+                <div class="floating-product product-5">
+                    <img src="https://images.unsplash.com/photo-1546868871-704d779b4f7b?w=200&auto=format" alt="Smart Watch">
+                    <div class="product-tag">$299</div>
+                </div>
+                <div class="floating-product product-6">
+                    <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&auto=format" alt="Shoes">
+                    <div class="product-tag">$189</div>
+                </div>
+                <div class="floating-product product-7">
+                    <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=200&auto=format" alt="Sunglasses">
+                    <div class="product-tag">$129</div>
+                </div>
+                <div class="floating-product product-8">
+                    <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200&auto=format" alt="Camera">
+                    <div class="product-tag">$649</div>
+                </div>
+            </div>
+
+            <!-- Main Showcase Content -->
+            <div class="showcase-content">
+                <div class="showcase-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>250K+ items sold securely</span>
+                </div>
+                
+                <h1 class="showcase-title">
+                    Where <span class="gradient-text">sellers</span> meet<br>
+                    <span class="gradient-text">buyers</span> with confidence
+                </h1>
+                
+                <p class="showcase-description">
+                    Join the fastest-growing escrow marketplace. From sneakers to luxury watches, 
+                    every transaction is protected.
+                </p>
+
+                <!-- Live Activity Feed -->
+                <div class="activity-feed">
+                    <div class="activity-item">
+                        <img src="https://images.unsplash.com/photo-1494790108777-466d68e3a4a1?w=50&auto=format" alt="User">
+                        <div class="activity-details">
+                            <span class="activity-user">Sarah K.</span>
+                            <span class="activity-action">just sold</span>
+                            <span class="activity-item-name">Air Jordan 1</span>
+                        </div>
+                        <span class="activity-price">$420</span>
+                    </div>
+                    <div class="activity-item">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&auto=format" alt="User">
+                        <div class="activity-details">
+                            <span class="activity-user">Mike R.</span>
+                            <span class="activity-action">just bought</span>
+                            <span class="activity-item-name">Rolex Submariner</span>
+                        </div>
+                        <span class="activity-price">$8,950</span>
+                    </div>
+                    <div class="activity-item">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&auto=format" alt="User">
+                        <div class="activity-details">
+                            <span class="activity-user">Emma L.</span>
+                            <span class="activity-action">listed</span>
+                            <span class="activity-item-name">MacBook Pro M3</span>
+                        </div>
+                        <span class="activity-price">$2,499</span>
+                    </div>
+                </div>
+
+                
+            </div>
+            <div class="showcase-overlay"></div>
+        </div>
+
+        <!-- Right Side - Registration Form -->
+        <div class="form-side">
+            <div class="form-container">
+                <!-- Header -->
+                <div class="form-header">
+                    <a href="/" class="mobile-logo">Asset<span>Hub</span></a>
+                    <h2>Create free account</h2>
+                    
+                </div>
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="message {{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <!-- Registration Form -->
+                <form class="register-form" method="POST" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Name Fields -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">
+                                <i class="far fa-user"></i>
+                                First name
+                            </label>
+                            <input type="text" id="firstName" name="first_name" placeholder="John" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">
+                                <i class="far fa-user"></i>
+                                Last name
+                            </label>
+                            <input type="text" id="lastName" name="last_name" placeholder="Doe" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                    <!-- Email -->
+
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="far fa-envelope"></i>
+                                Email address
+                            </label>
+                            <input type="email" id="email" name="email" placeholder="john.doe@example.com" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                        <label for="username">
+                            <i class="far fa-phone"></i>
+                            Whatsapp Number
+                        </label>
+                        <input type="text" id="phone" name="phone" placeholder="+477 739*****46" class="form-input">
+                        <input type="hidden" name="full_phone" id="full_phone">
+                    </div>
+                        
+                    </div>
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="far fa-at"></i>
+                            Username
+                        </label>
+                        <input type="text" id="username" name="username" placeholder="johndoe123" class="form-input">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <div class="password-field">
+                            <input type="password" id="password" name="password" placeholder="••••••••" class="form-input">
+                            <button type="button" class="password-toggle" aria-label="Show password">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-hint">Minimum 8 characters</div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            <i class="fas fa-lock"></i>
+                            Confirm password
+                        </label>
+                        <div class="password-field">
+                            <input type="password" id="confirmPassword" name="confirm_password" placeholder="••••••••" class="form-input">
+                            <button type="button" class="password-toggle" aria-label="Show password">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Role Selection -->
+                    <div class="form-group">
+                        <label for="role">
+                            <i class="fas fa-store"></i>
+                            I want to
+                        </label>
+                        <select id="role" name="role" class="form-input">
+                            <option value="" disabled selected>Select your role</option>
+                            <option value="buyer">Buyer</option>
+                            <option value="seller">Seller</option>
+                            <option value="both">Both buyer & seller</option>
+                        </select>
+                    </div>
+
+                    <!-- Terms Checkbox -->
+                    <div class="form-group terms-group">
+                        <label class="checkbox">
+                            <input type="checkbox" name="terms" required>
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                                I agree to the <a href="/terms/">Terms</a> & <a href="/privacy/">Privacy</a>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn">
+                        <span>Create account</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <!-- Login Link -->
+                    <div class="login-link">
+                        Already have an account? <a href="/login/">Sign in</a>
+                    </div>
+                </form>
+
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple JavaScript for password toggle only -->
+    <script src="{% static "js/register.js" %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+
+<script>
+const phoneInput = document.querySelector("#phone");
+const fullPhone = document.querySelector("#full_phone");
+
+const iti = window.intlTelInput(phoneInput, {
+    initialCountry: "auto",
+    geoIpLookup: function(callback) {
+        fetch("https://ipapi.co/json")
+        .then(res => res.json())
+        .then(data => callback(data.country_code))
+        .catch(() => callback("ng"));
+    },
+    preferredCountries: ["ng","us","gb"],
+    separateDialCode: true,
+    utilsScript:"https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+});
+
+document.querySelector("#profileForm").addEventListener("submit", function(){
+    fullPhone.value = iti.getNumber();
+});
+</script>
+</body>
+</html>

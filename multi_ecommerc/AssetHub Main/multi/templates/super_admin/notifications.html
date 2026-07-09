@@ -1,0 +1,180 @@
+
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Super Admin{% endblock %}
+{% block notifications_active %}active{% endblock %}
+
+{% block content %}
+<div class="user-management">
+    <div class="section-header">
+        <div>
+            <h2>Notifications</h2>
+            <p>Messages from contact us and report submissions</p>
+        </div>
+        <div class="filter-group">
+            <div class="filter-select">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                <select name="type">
+                    <option value="all">All Types</option>
+                    <option value="contact">Contact Us</option>
+                    <option value="report">Reports</option>
+                    <option value="support">Support</option>
+                </select>
+            </div>
+            <div class="filter-select">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                <select name="status">
+                    <option value="all">All Status</option>
+                    <option value="unread">Unread</option>
+                    <option value="read">Read</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="users-table-container">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>Subject</th>
+                    <th>Message Preview</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+{% for n in notifications %}
+<tr>
+    <td><input type="checkbox"></td>
+
+    <!-- TYPE -->
+    <td>
+        <span class="badge role-buyer">
+            {{ n.get_message_type_display }}
+        </span>
+    </td>
+
+    <!-- USER -->
+    <td>
+        <div class="user-info">
+            <div class="user-details">
+                <span class="user-name">{{ n.full_name }}</span>
+                <span class="user-email">{{ n.email }}</span>
+            </div>
+        </div>
+    </td>
+
+    <!-- SUBJECT -->
+    <td>{{ n.subject|default:"No Subject" }}</td>
+
+    <!-- MESSAGE -->
+    <td>{{ n.short_message }}</td>
+
+    <!-- DATE -->
+    <td>{{ n.created_at|date:"Y-m-d H:i" }}</td>
+
+    <!-- STATUS -->
+    <td>
+        <span class="badge 
+            {% if n.status == 'unread' %}status-active
+            {% elif n.status == 'read' %}status-inactive
+            {% else %}status-suspended
+            {% endif %}">
+            {{ n.get_status_display }}
+        </span>
+    </td>
+
+    <!-- ACTIONS -->
+    <td>
+        <div class="action-buttons">
+            
+            <!-- VIEW -->
+            <a href="{% url 'view_message' n.id %}" class="action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <polyline points="9 14 4 9 9 4"/>
+                    <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
+                </svg>
+            </a>
+
+            <!-- DELETE -->
+            <a href="{% url 'delete_message' n.id %}" class="action-btn danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+            </a>
+            
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="8">No messages yet</td>
+</tr>
+{% endfor %}
+</tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <span class="pagination-info">
+            Showing {{ notifications.start_index }} - {{ notifications.end_index }} 
+            of {{ notifications.paginator.count }} notifications
+        </span>
+
+        <div class="pagination-buttons">
+
+            <!-- PREVIOUS -->
+            {% if notifications.has_previous %}
+                <a href="?page={{ notifications.previous_page_number }}">
+                    <button>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <polyline points="15 18 9 12 15 6"/>
+                        </svg>
+                    </button>
+                </a>
+            {% else %}
+                <button disabled>
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </button>
+            {% endif %}
+
+            <!-- CURRENT PAGE -->
+            <span class="page-number">
+                {{ notifications.number }} / {{ notifications.paginator.num_pages }}
+            </span>
+
+            <!-- NEXT -->
+            {% if notifications.has_next %}
+                <a href="?page={{ notifications.next_page_number }}">
+                    <button>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </button>
+                </a>
+            {% else %}
+                <button disabled>
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </button>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+

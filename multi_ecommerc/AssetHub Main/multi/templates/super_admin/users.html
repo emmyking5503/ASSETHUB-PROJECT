@@ -1,0 +1,159 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}User Management - Super Admin{% endblock %}
+{% block users_active %}active{% endblock %}
+
+{% block content %}
+<div class="user-management">
+    <div class="section-header">
+        <div>
+            <h2>User Management</h2>
+            <p>Manage buyers, sellers, and dual-role users across all markets</p>
+        </div>
+    </div>
+
+    
+        <div class="filters-bar">
+
+            <!-- SEARCH -->
+            <div class="search-box">
+                <input type="text" name="search"
+                    placeholder="Search users by name, email, or ID..."
+                    value="{{ search_query }}">
+            </div>
+
+            <div class="filter-group">
+
+                <!-- ROLE -->
+                <div class="filter-select">
+                    <select name="role">
+                        <option value="all" {% if role_filter == 'all' %}selected{% endif %}>All Roles</option>
+                        <option value="buyer" {% if role_filter == 'buyer' %}selected{% endif %}>Buyers</option>
+                        <option value="seller" {% if role_filter == 'seller' %}selected{% endif %}>Sellers</option>
+                        <option value="both" {% if role_filter == 'both' %}selected{% endif %}>Both</option>
+                    </select>
+                </div>
+
+                <!-- STATUS -->
+                <div class="filter-select">
+                    <select name="status">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" class="action-btn">Filter</button>
+
+            </div>
+        </div>
+    
+
+    <div class="users-table-container">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Purchases</th>
+                    <th>Orders</th>
+                    <th>Revenue</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="userTableBody">
+                {% include 'super_admin/partials/user_rows.html' with user_data=page_obj.object_list %}
+            </tbody>
+                    </table>
+                </div>
+
+
+                                    
+            <div class="pagination">
+
+                <span class="pagination-info">
+                    Showing {{ page_obj.start_index }} - {{ page_obj.end_index }} 
+                    of {{ page_obj.paginator.count }} users
+                </span>
+
+                <div class="pagination-buttons">
+
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&role={{ role_filter }}&status={{ status_filter }}">
+                        <button>◀</button>
+                    </a>
+                    {% else %}
+                    <button disabled>◀</button>
+                    {% endif %}
+
+                    <span class="page-number">{{ page_obj.number }}</span>
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&role={{ role_filter }}&status={{ status_filter }}">
+                        <button>▶</button>
+                    </a>
+                    {% else %}
+                    <button disabled>▶</button>
+                    {% endif %}
+
+                </div>
+            </div>
+            </div>
+            {% endblock %}
+
+            {% block extra_js %}
+                <script>
+                document.addEventListener("DOMContentLoaded", function () {
+
+                    console.log("JS WORKING ✅");
+
+                    const searchInput = document.querySelector('input[name="search"]');
+                    const roleFilter = document.querySelector('select[name="role"]');
+                    const statusFilter = document.querySelector('select[name="status"]');
+                    const tableBody = document.getElementById('userTableBody');
+
+                    let timeout = null;
+
+                    function fetchUsers() {
+                        console.log("Fetching...");
+
+                        const search = searchInput.value;
+                        const role = roleFilter.value;
+                        const status = statusFilter.value;
+                        tableBody.innerHTML = "<tr><td colspan='9'>Searching...</td></tr>";
+                        fetch(`/ajax/search-users/?search=${encodeURIComponent(search)}&role=${role}&status=${status}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log("DATA:", data);
+                                tableBody.innerHTML = data.html;
+
+                                const params = new URLSearchParams({
+                                    search: search,
+                                    role: role,
+                                    status: status
+                                });
+
+                                history.replaceState(null, '', '?' + params.toString());
+                            })
+                            .catch(err => console.log("ERROR:", err));
+                    }
+
+                    // 🔥 LIVE SEARCH
+                    searchInput.addEventListener('keyup', () => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(fetchUsers, 400);
+                    });
+
+                    // 🔥 FILTER CHANGE
+                    roleFilter.addEventListener('change', fetchUsers);
+                    statusFilter.addEventListener('change', fetchUsers);
+
+                });
+                </script>
+            {% endblock %}

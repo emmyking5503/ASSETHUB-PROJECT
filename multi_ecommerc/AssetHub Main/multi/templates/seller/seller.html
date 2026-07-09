@@ -1,0 +1,175 @@
+{% extends "seller/basee.html" %}
+{% load static %}
+
+{% block title %}Dashboard - Nexus Seller{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem;">
+        Welcome back, {{ user.first_name }}! 👋
+    </h2>
+    <p style="color: var(--gray-500);">Here's what's happening with your store today.</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-value">${{ total_sales }}</div>
+                <div class="stat-label">Total Sales</div>
+                <div class="stat-change positive">
+                    <i class="fa-solid fa-arrow-up"></i> 12% from last month
+                </div>
+            </div>
+            <div class="stat-icon primary">
+                <i class="fa-solid fa-dollar-sign"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-value">{{ total_orders }}</div>
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-change positive">
+                    <i class="fa-solid fa-arrow-up"></i> 8% new orders
+                </div>
+            </div>
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-value">{{ pending_orders }}</div>
+                <div class="stat-label">Pending Orders</div>
+                <div class="stat-change neutral">
+                    Needs attention
+                </div>
+            </div>
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-value">{{ p2p_orders }}</div>
+                <div class="stat-label">P2P Orders</div>
+                <div class="stat-change neutral">
+                    Active Escrow
+                </div>
+            </div>
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-value">{{ total_products }}</div>
+                <div class="stat-label">Products Listed</div>
+                <div class="stat-change negative">
+                    {{ out_of_stock }} Out of Stock
+                </div>
+            </div>
+            <div class="stat-icon pink">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Recent Orders</h3>
+        <a href="" class="btn btn-sm btn-secondary">View All</a>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in recent_orders %}
+                <tr>
+                    <td style="font-weight: 600;">#ORD-{{ item.order.id }}</td>
+
+                    <td>
+                        <div class="table-product">
+                            <img src="{{ item.product.front_image.url }}" alt="Product">
+                            <span>{{ item.product.name }}</span>
+                        </div>
+                    </td>
+
+                    <!-- ORDER TYPE -->
+                    <td>
+                        {% if item.order.order_type == "escrow" %}
+                            <span class="type-badge type-p2p">Escrow</span>
+                        {% elif item.order.order_type == "whatsapp" %}
+                            <span class="type-badge type-whatsapp">WhatsApp</span>
+                        {% else %}
+                            <span class="type-badge type-standard">Standard</span>
+                            
+                        {% endif %}
+                    </td>
+
+                    <td>{{ item.order.created_at|date:"M d, Y" }}</td>
+
+                    <!-- STATUS -->
+                    <td>
+                        {% if item.status == "Pending" %}
+                            <span class="badge badge-pending">Pending</span>
+
+                        {% elif item.status == "Processing" %}
+                            <span class="badge badge-processing">Processing</span>
+
+                        {% elif item.status == "Shipped" %}
+                            <span class="badge badge-processing">Shipped</span>
+
+                        {% elif item.status == "Delivered" %}
+                            <span class="badge badge-info">Delivered</span>
+
+                        {% elif item.status == "Completed" %}
+                            <span class="badge badge-completed">Completed</span>
+                        {% endif %}
+                    </td>
+
+                    <td style="text-align: right; font-weight: 600;">
+                        ${{ item.subtotal }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center; padding:20px;">
+                        No orders yet
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ subject }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f3f4f6; color: #111827; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: auto; background: #ffffff; padding: 24px; border-radius: 8px; }
+    .header { background: #4f46e5; color: white; padding: 16px; text-align: center; border-radius: 8px 8px 0 0; }
+    .content { padding: 16px; line-height: 1.5; }
+    .footer { font-size: 12px; color: #6b7280; text-align: center; padding: 12px; }
+    .btn { display: inline-block; background: #4f46e5; color: white; padding: 10px 16px; border-radius: 4px; text-decoration: none; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>{{ site_name }} Support</h2>
+    </div>
+    <div class="content">
+      <p>Hi {{ user_name }},</p>
+
+      <p>We have responded to your message regarding: <strong>{{ original_subject }}</strong>.</p>
+
+      <div style="border-left: 4px solid #4f46e5; padding-left: 12px; margin: 16px 0;">
+        {{ reply_message|linebreaks }}
+      </div>
+
+      <p>If you have any further questions, reply directly to this email.</p>
+
+      <a href="mailto:kingsleyspotless44@gmail.com" class="btn">Contact Support</a>
+    </div>
+    <div class="footer">
+      This email was sent by <strong>{{ site_name }}</strong> (support@yourassethub.com).<br>
+      Please do not reply to this email if you are not the intended recipient.
+    </div>
+  </div>
+</body>
+</html>

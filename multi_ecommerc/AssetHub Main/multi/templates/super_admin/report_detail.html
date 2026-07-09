@@ -1,0 +1,34 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Report Details - Super Admin{% endblock %}
+{% block reports_active %}active{% endblock %}
+
+{% block content %}
+<div class="detail-panel">
+    <div class="section-header">
+        <div>
+            <h2>Report #{{ report.id }}</h2>
+            <p>Report submitted by {{ report.full_name }}</p>
+        </div>
+        <a href="{% url 'admin_reports' %}" class="action-btn">Back to reports</a>
+    </div>
+
+    <div class="detail-card">
+        <p><strong>Reporter:</strong> {{ report.full_name }}</p>
+        <p><strong>Email:</strong> {{ report.email }}</p>
+        <p><strong>Type:</strong> {{ report.get_message_type_display }}</p>
+        <p><strong>Subject:</strong> {{ report.subject|default:'No subject' }}</p>
+        <p><strong>Message:</strong></p>
+        <p>{{ report.message }}</p>
+        <p><strong>Status:</strong> {{ report.get_status_display }}</p>
+        <p><strong>Date:</strong> {{ report.created_at|date:"Y-m-d H:i" }}</p>
+    </div>
+
+    <form method="post" class="action-form">
+        {% csrf_token %}
+        <button type="submit" name="action" value="resolve" class="action-btn">Mark Resolved</button>
+        <button type="submit" name="action" value="dismiss" class="action-btn warning">Dismiss</button>
+    </form>
+</div>
+{% endblock %}

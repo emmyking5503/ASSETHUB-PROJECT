@@ -1,0 +1,991 @@
+{% extends "buyer/buyer_base.html" %}
+{% load custom_filters %}
+{% load static %}
+
+{% block title %}Dispute Detail · AssetHub{% endblock %}
+{% block page_title %}Dispute Detail{% endblock %}
+{% block extra_css %}
+<style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #e0e7ff;
+            --primary-dark: #4f46e5;
+            --primary-subtle: #f5f3ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            --gray-25: #fcfcfd;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-150: #eceef2;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --sidebar-width: 264px;
+            --card-radius: 16px;
+            --card-shadow: 0 0 0 1px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.04);
+            --card-shadow-hover: 0 0 0 1px rgba(0,0,0,0.04), 0 4px 20px -2px rgba(0,0,0,0.06);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px -2px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8f9fc;
+            color: var(--gray-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: #fff;
+            border-right: 1px solid var(--gray-200);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .sidebar-brand {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-brand .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+        .sidebar-brand .brand-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--gray-900);
+            letter-spacing: -0.5px;
+        }
+        .sidebar-brand .brand-text span { color: var(--primary); }
+        .sidebar-divider { height: 1px; background: var(--gray-200); margin: 0 20px; }
+        .sidebar-nav { flex: 1; padding: 12px 10px; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: var(--gray-500);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+            margin: 0 4px;
+            position: relative;
+        }
+        .nav-link:hover { background: var(--gray-50); color: var(--gray-700); }
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #eef2ff 100%);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 0 3px 3px 0;
+        }
+        .nav-link i { font-size: 18px; width: 20px; text-align: center; }
+        .nav-badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        .sidebar-footer { padding: 12px 10px; border-top: 1px solid var(--gray-100); }
+
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .topbar {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            height: 64px;
+        }
+        .topbar-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 4px 8px 4px 4px;
+            border-radius: 10px;
+        }
+        .user-profile:hover { background: var(--gray-50); }
+        .user-name { font-size: 14px; font-weight: 600; color: var(--gray-900); }
+        .user-role { font-size: 12px; color: var(--gray-400); font-weight: 500; }
+        .user-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--gray-200);
+        }
+
+        .content-area {
+            padding: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex: 1;
+            width: 100%;
+        }
+
+        .ah-card {
+            background: #fff;
+            border-radius: var(--card-radius);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+        .ah-card:hover { box-shadow: var(--card-shadow-hover); }
+        .ah-card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: linear-gradient(180deg, #fff 0%, var(--gray-25) 100%);
+        }
+        .ah-card-header h2 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ah-card-body { padding: 24px; }
+
+        .badge-ah {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-ah-success { background: var(--success-light); color: #047857; border: 1px solid #a7f3d0; }
+        .badge-ah-danger { background: var(--danger-light); color: #b91c1c; border: 1px solid #fecaca; }
+        .badge-ah-warning { background: var(--warning-light); color: #b45309; border: 1px solid #fde68a; }
+        .badge-ah-info { background: var(--info-light); color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .badge-ah-gray { background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--gray-200); }
+        .badge-ah-purple { background: #f3e8ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+        .file-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 14px;
+            margin-top: 12px;
+        }
+        .file-preview-card {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .file-preview-card:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
+        }
+        .file-preview-thumb {
+            height: 110px;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-50) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .file-preview-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .file-preview-card:hover .file-preview-thumb img { transform: scale(1.05); }
+        .file-preview-thumb .file-icon { font-size: 36px; color: var(--primary); opacity: 0.7; }
+        .file-preview-thumb .file-type-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .file-preview-info {
+            padding: 12px 14px;
+        }
+        .file-preview-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-800);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+        .file-preview-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+        .file-preview-card .file-remove {
+            display: none;
+        }
+
+        /* Multi-item order summary */
+        .order-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .order-item-card {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            border: 1px solid var(--gray-150);
+            align-items: center;
+            transition: var(--transition);
+        }
+        .order-item-card:hover {
+            background: #fff;
+            border-color: var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+        .order-item-card .item-image {
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            flex-shrink: 0;
+            background: #fff;
+        }
+        .order-item-card .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .order-item-card .item-details {
+            min-width: 0;
+        }
+        .order-item-card .item-details h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .order-item-card .item-details .item-meta {
+            font-size: 13px;
+            color: var(--gray-500);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .order-item-card .item-details .item-meta .separator {
+            color: var(--gray-300);
+        }
+        .order-item-card .item-status {
+            text-align: right;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-end;
+        }
+        .order-item-card .item-status .price-tag {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .order-totals {
+            display: flex;
+            justify-content: flex-end;
+            gap: 32px;
+            padding: 16px 20px;
+            background: var(--gray-25);
+            border-radius: 12px;
+            border: 1px solid var(--gray-150);
+            margin-top: 8px;
+        }
+        .order-totals .total-item {
+            text-align: right;
+        }
+        .order-totals .total-item .label {
+            font-size: 12px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .order-totals .total-item .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        .order-totals .total-item .value.primary { color: var(--primary); }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 28px;
+            font-size: 13px;
+        }
+        .breadcrumb-nav a {
+            color: var(--gray-400);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .breadcrumb-nav a:hover { color: var(--primary); }
+        .breadcrumb-nav .current { color: var(--gray-700); font-weight: 600; }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--gray-900);
+            letter-spacing: -0.6px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .page-header h1 .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--danger-light) 0%, #fecaca 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--danger);
+            font-size: 22px;
+        }
+
+        .detail-badge {
+            background: var(--primary-subtle);
+            color: var(--primary-dark);
+            border: 1px solid var(--primary-light);
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ah-secondary {
+            background: #fff;
+            border: 1.5px solid var(--gray-300);
+            color: var(--gray-600);
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .btn-ah-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+            color: var(--gray-800);
+        }
+
+        .dispute-reason-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .dispute-reason-badge.wrong-item { background: #fef3c7; color: #92400e; }
+        .dispute-reason-badge.damaged { background: #fee2e2; color: #991b1b; }
+        .dispute-reason-badge.missing { background: #dbeafe; color: #1e40af; }
+
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-wrapper { margin-left: 0; }
+            .content-area { padding: 20px; }
+            .order-item-card { grid-template-columns: 1fr; text-align: center; }
+            .order-item-card .item-status { text-align: center; align-items: center; }
+            .order-item-card .item-details .item-meta { justify-content: center; }
+            .order-totals { flex-direction: column; align-items: flex-end; }
+        }
+        @media (max-width: 575px) {
+            .content-area { padding: 16px; }
+            .ah-card-body { padding: 18px; }
+            .page-header h1 { font-size: 22px; }
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <a href="{% url 'buyer_dashboard' %}"><i class="bi bi-house-door"></i> Home</a>
+    <span class="separator"><i class="bi bi-chevron-right"></i></span>
+    <a href="{% url 'buyer_order' %}">My Orders</a>
+    <span class="separator"><i class="bi bi-chevron-right"></i></span>
+    <a href="{% url 'buyer_order_detail' order.id order_item.seller.id %}">Order #ORD-{{ order.id }}</a>
+    <span class="separator"><i class="bi bi-chevron-right"></i></span>
+    <span class="current">Dispute Detail</span>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1>
+        <span class="header-icon"><i class="bi bi-shield-exclamation"></i></span>
+        Dispute Claim #{{ dispute.dispute_id }}
+        <span class="detail-badge"><i class="bi bi-eye"></i> Buyer View</span>
+    </h1>
+    <p style="color: var(--gray-500); margin-top: 8px;">
+        Review the evidence you have uploaded for this dispute. All files are securely stored and will be reviewed by the dispute team.
+    </p>
+</div>
+
+<!-- ===== ORDER SUMMARY ===== -->
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-receipt"></i>Order Summary</h2>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span class="badge-ah badge-ah-warning"><i class="bi bi-lock-fill"></i> Escrow Locked</span>
+            <span class="badge-ah badge-ah-gray"><i class="bi bi-box-seam"></i> {{ order_item.quantity }} item{{ order_item.quantity|pluralize }}</span>
+        </div>
+    </div>
+    <div class="ah-card-body">
+        <div class="order-items-container">
+            <!-- Disputed Item -->
+            <div class="order-item-card">
+                <div class="item-image">
+                    {% if product.front_image %}
+                        <img src="{{ product.front_image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300?text=No+Image" alt="No Image">
+                    {% endif %}
+                </div>
+                <div class="item-details">
+                    <h4>{{ product.name }}</h4>
+                    <div class="item-meta">
+                        <span>Qty: {{ order_item.quantity }}</span>
+                        <span class="separator">·</span>
+                        <span>${{ order_item.price|floatformat:2 }}</span>
+                        <span class="separator">·</span>
+                        <span class="dispute-reason-badge {{ dispute.reason|slugify }}">
+                            <i class="bi bi-exclamation-triangle"></i> {{ dispute.get_reason_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="item-status">
+                    <span class="price-tag">${{ order_item.subtotal|floatformat:2 }}</span>
+                    <span class="badge-ah badge-ah-danger"><i class="bi bi-shield-exclamation"></i> Disputed</span>
+                </div>
+            </div>
+
+            <!-- Order totals -->
+            <div class="order-totals">
+                <div class="total-item">
+                    <div class="label">Subtotal</div>
+                    <div class="value">${{ order_item.subtotal|floatformat:2 }}</div>
+                </div>
+                <div class="total-item">
+                    <div class="label">Shipping</div>
+                    <div class="value">$0.00</div>
+                </div>
+                <div class="total-item">
+                    <div class="label">Total</div>
+                    <div class="value primary">${{ order_item.subtotal|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DISPUTE REASON ===== -->
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-exclamation-triangle"></i>Dispute Reason</h2>
+        <span class="badge-ah badge-ah-danger"><i class="bi bi-file-earmark-text"></i> {{ dispute.get_reason_display }}</span>
+    </div>
+    <div class="ah-card-body">
+        <div style="background:var(--gray-50); padding:16px 20px; border-radius:12px; border-left:4px solid var(--warning);">
+            <div style="font-weight:700; color:var(--gray-900); font-size:14px;">{{ product.name }}</div>
+            <div style="font-size:13px; color:var(--gray-600);">
+                {{ dispute.get_reason_display }} · {{ dispute.complaint|truncatewords:20 }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DETAILED DESCRIPTION ===== -->
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-pencil-square"></i>Detailed Description</h2>
+    </div>
+    <div class="ah-card-body">
+        <div style="background: var(--gray-50); padding: 20px 24px; border-radius: 12px; border-left: 4px solid var(--primary);">
+            <p style="margin:0; color: var(--gray-700); line-height: 1.8; white-space: pre-line;">
+                {{ dispute.complaint }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== BUYER EVIDENCE ===== -->
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-cloud-arrow-up"></i>Your Evidence</h2>
+        <span class="badge-ah badge-ah-success"><i class="bi bi-check-circle"></i> {{ buyer_evidence.count }} file{{ buyer_evidence.count|pluralize }}</span>
+    </div>
+    <div class="ah-card-body">
+        {% if buyer_evidence %}
+        <div class="file-preview-grid">
+            {% for evidence in buyer_evidence %}
+            <div class="file-preview-card">
+                <div class="file-preview-thumb">
+                    {% if evidence.file_type == 'image' %}
+                        <img src="{{ evidence.file.url }}" alt="{{ evidence.file_name }}">
+                    {% else %}
+                        <div class="file-icon">
+                            {% if evidence.file_type == 'pdf' %}
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            {% elif evidence.file_type == 'video' %}
+                                <i class="bi bi-camera-video"></i>
+                            {% elif evidence.file_type == 'document' %}
+                                <i class="bi bi-file-earmark-text"></i>
+                            {% else %}
+                                <i class="bi bi-file-earmark"></i>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <span class="file-type-tag">{{ evidence.file_type|upper }}</span>
+                </div>
+                <div class="file-preview-info">
+                    <div class="file-preview-name">{{ evidence.file_name }}</div>
+                    <div class="file-preview-meta">
+                        <span>{{ evidence.get_file_type_display }}</span>
+                        <span>
+                            {% if evidence.file_size > 1048576 %}
+                                {{ evidence.file_size|div:1048576|floatformat:1 }} MB
+                            {% else %}
+                                {{ evidence.file_size|div:1024|floatformat:1 }} KB
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align:center; color:var(--gray-400); padding: 20px;">
+            <i class="bi bi-inbox"></i> No evidence uploaded yet.
+        </p>
+        {% endif %}
+        <div style="margin-top: 14px; font-size: 13px; color: var(--gray-400);">
+            <i class="bi bi-info-circle"></i> All files are securely stored and will be reviewed by the dispute team.
+        </div>
+    </div>
+</div>
+
+<!-- ===== SELLER EVIDENCE (if seller has responded) ===== -->
+{% if seller_evidence %}
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-cloud-arrow-up"></i>Seller's Evidence</h2>
+        <span class="badge-ah badge-ah-info"><i class="bi bi-check-circle"></i> {{ seller_evidence.count }} file{{ seller_evidence.count|pluralize }}</span>
+    </div>
+    <div class="ah-card-body">
+        <div class="file-preview-grid">
+            {% for evidence in seller_evidence %}
+            <div class="file-preview-card">
+                <div class="file-preview-thumb">
+                    {% if evidence.file_type == 'image' %}
+                        <img src="{{ evidence.file.url }}" alt="{{ evidence.file_name }}">
+                    {% else %}
+                        <div class="file-icon">
+                            {% if evidence.file_type == 'pdf' %}
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            {% elif evidence.file_type == 'video' %}
+                                <i class="bi bi-camera-video"></i>
+                            {% elif evidence.file_type == 'document' %}
+                                <i class="bi bi-file-earmark-text"></i>
+                            {% else %}
+                                <i class="bi bi-file-earmark"></i>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <span class="file-type-tag">{{ evidence.file_type|upper }}</span>
+                </div>
+                <div class="file-preview-info">
+                    <div class="file-preview-name">{{ evidence.file_name }}</div>
+                    <div class="file-preview-meta">
+                        <span>{{ evidence.get_file_type_display }}</span>
+                        <span>
+                            {% if evidence.file_size > 1048576 %}
+                                {{ evidence.file_size|div:1048576|floatformat:1 }} MB
+                            {% else %}
+                                {{ evidence.file_size|div:1024|floatformat:1 }} KB
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ===== SELLER RESPONSE (if available) ===== -->
+{% if dispute.seller_response %}
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-reply"></i>Seller's Response</h2>
+        <span class="badge-ah badge-ah-info"><i class="bi bi-clock"></i> {{ dispute.seller_responded_at|date:"M d, Y · h:i A" }}</span>
+    </div>
+    <div class="ah-card-body">
+        <div style="background: var(--info-subtle); padding: 20px 24px; border-radius: 12px; border-left: 4px solid var(--info);">
+            <p style="margin:0; color: var(--gray-700); line-height: 1.8; white-space: pre-line;">
+                {{ dispute.seller_response }}
+            </p>
+        </div>
+        {% if dispute.seller_courier %}
+        <div style="margin-top: 12px; font-size: 13px; color: var(--gray-500);">
+            <i class="bi bi-truck"></i> Courier: <strong>{{ dispute.seller_courier }}</strong>
+            {% if dispute.seller_tracking %}
+                · Tracking: <strong>{{ dispute.seller_tracking }}</strong>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- ===== REQUESTED RESOLUTION ===== -->
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-check2-circle"></i>Requested Resolution</h2>
+        <span class="badge-ah badge-ah-info"><i class="bi bi-arrow-repeat"></i> {{ dispute.get_requested_resolution_display }}</span>
+    </div>
+    <div class="ah-card-body">
+        <div style="background: var(--primary-subtle); padding: 18px 24px; border-radius: 12px; border: 1px solid var(--primary-light);">
+            <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,var(--primary-light),#c7d2fe);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:24px;">
+                    {% if dispute.requested_resolution == 'full_refund' %}
+                        <i class="bi bi-cash-stack"></i>
+                    {% elif dispute.requested_resolution == 'partial_refund' %}
+                        <i class="bi bi-cash"></i>
+                    {% elif dispute.requested_resolution == 'replacement' %}
+                        <i class="bi bi-arrow-repeat"></i>
+                    {% else %}
+                        <i class="bi bi-three-dots"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <div style="font-weight:700; color:var(--gray-900);">{{ dispute.get_requested_resolution_display }}</div>
+                    <div style="font-size:14px; color:var(--gray-500);">
+                        {% if dispute.requested_resolution == 'full_refund' %}
+                            Return item & get full refund of ${{ order_item.subtotal|floatformat:2 }}
+                        {% elif dispute.requested_resolution == 'partial_refund' %}
+                            Keep item & get partial refund
+                        {% elif dispute.requested_resolution == 'replacement' %}
+                            Exchange for a new item
+                        {% else %}
+                            Resolution to be determined by admin
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DECLARATION ===== -->
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-file-earmark-check"></i>Declaration</h2>
+    </div>
+    <div class="ah-card-body">
+        <div style="background:var(--gray-50); padding:20px 24px; border-radius:12px; border:1px solid var(--gray-200);">
+            <div class="d-flex align-items-start gap-3">
+                <i class="bi bi-check-circle-fill" style="color:var(--success); font-size:20px;"></i>
+                <span style="font-size:14px; color:var(--gray-700);">
+                    <strong>I confirm that all information and evidence provided is accurate.</strong> I understand that submitting false information may result in account restrictions, including suspension of buying and selling privileges on AssetHub.
+                </span>
+            </div>
+            <div style="margin-top: 8px; font-size: 12px; color: var(--gray-400);">
+                Declared on {{ dispute.created_at|date:"M d, Y · h:i A" }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== WORKFLOW STATUS ===== -->
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-diagram-3"></i>Dispute Workflow</h2>
+        {% if dispute.status == 'awaiting_seller' %}
+            <span class="badge-ah badge-ah-warning"><i class="bi bi-hourglass-split"></i> Awaiting Seller Response</span>
+        {% elif dispute.status == 'under_review' %}
+            <span class="badge-ah badge-ah-warning"><i class="bi bi-search"></i> Under Review</span>
+        {% elif dispute.status == 'more_info' %}
+            <span class="badge-ah badge-ah-info"><i class="bi bi-info-circle"></i> More Info Needed</span>
+        {% elif dispute.status == 'resolved_buyer' %}
+            <span class="badge-ah badge-ah-success"><i class="bi bi-check-circle"></i> Resolved - Buyer Won</span>
+        {% elif dispute.status == 'resolved_seller' %}
+            <span class="badge-ah badge-ah-danger"><i class="bi bi-check-circle"></i> Resolved - Seller Won</span>
+        {% elif dispute.status == 'resolved_mutual' %}
+            <span class="badge-ah badge-ah-purple"><i class="bi bi-check-circle"></i> Resolved - Mutual</span>
+        {% elif dispute.status == 'return_required' %}
+            <span class="badge-ah badge-ah-warning"><i class="bi bi-box-seam"></i> Return Required</span>
+        {% elif dispute.status == 'return_shipped' %}
+            <span class="badge-ah badge-ah-info"><i class="bi bi-truck"></i> Return Shipped</span>
+        {% elif dispute.status == 'return_received' %}
+            <span class="badge-ah badge-ah-success"><i class="bi bi-check-circle"></i> Return Received</span>
+        {% else %}
+            <span class="badge-ah badge-ah-gray"><i class="bi bi-question-circle"></i> {{ dispute.status }}</span>
+        {% endif %}
+    </div>
+    <div class="ah-card-body">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; background:var(--gray-50); padding:16px 20px; border-radius:14px;">
+            
+            <!-- Step 1: Claim Submitted -->
+            <span class="badge-ah badge-ah-success"><i class="bi bi-check-circle"></i> Claim submitted</span>
+            <i class="bi bi-arrow-right" style="color:var(--gray-300);"></i>
+            
+            <!-- Step 2: Seller Notified -->
+            <span class="badge-ah badge-ah-success"><i class="bi bi-bell"></i> Seller notified</span>
+            <i class="bi bi-arrow-right" style="color:var(--gray-300);"></i>
+            
+            <!-- Step 3: Seller Response -->
+            {% if dispute.seller_response %}
+                <span class="badge-ah badge-ah-success"><i class="bi bi-reply"></i> Seller responded</span>
+            {% else %}
+                <span class="badge-ah badge-ah-gray"><i class="bi bi-reply"></i> Seller response</span>
+            {% endif %}
+            <i class="bi bi-arrow-right" style="color:var(--gray-300);"></i>
+            
+            <!-- Step 4: Admin Review -->
+            {% if dispute.status == 'under_review' or dispute.status == 'more_info' or dispute.status|slice:":8" == 'resolved_' or dispute.status == 'return_required' or dispute.status == 'return_shipped' or dispute.status == 'return_received' %}
+                <span class="badge-ah badge-ah-warning"><i class="bi bi-search"></i> Admin review</span>
+            {% else %}
+                <span class="badge-ah badge-ah-gray"><i class="bi bi-search"></i> Admin review</span>
+            {% endif %}
+            <i class="bi bi-arrow-right" style="color:var(--gray-300);"></i>
+            
+            <!-- Step 5: Final Decision -->
+            {% if dispute.status|slice:":8" == 'resolved_' %}
+                <span class="badge-ah badge-ah-success"><i class="bi bi-gavel"></i> Final decision</span>
+            {% else %}
+                <span class="badge-ah badge-ah-gray"><i class="bi bi-gavel"></i> Final decision</span>
+            {% endif %}
+            <i class="bi bi-arrow-right" style="color:var(--gray-300);"></i>
+            
+            <!-- Step 6: Escrow Updated -->
+            {% if dispute.status|slice:":8" == 'resolved_' %}
+                <span class="badge-ah badge-ah-success"><i class="bi bi-wallet2"></i> Escrow updated</span>
+            {% else %}
+                <span class="badge-ah badge-ah-gray"><i class="bi bi-wallet2"></i> Escrow updated</span>
+            {% endif %}
+        </div>
+        
+        <div style="margin-top:16px; font-size:13px; color:var(--gray-500);">
+            <i class="bi bi-clock-history"></i> 
+            Last updated: {{ dispute.updated_at|date:"M d, Y · h:i A" }}
+            {% if dispute.seller_responded_at %}
+                · Seller response received on {{ dispute.seller_responded_at|date:"M d, Y · h:i A" }}
+            {% endif %}
+            {% if dispute.seller_deadline and dispute.status == 'awaiting_seller' %}
+                · Seller deadline: {{ dispute.seller_deadline|date:"M d, Y · h:i A" }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ===== BUYER REPLY FORM (if awaiting buyer response) ===== -->
+{% if dispute.status == 'awaiting_buyer' or dispute.status == 'more_info' %}
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-reply"></i>Add Your Reply</h2>
+    </div>
+    <div class="ah-card-body">
+        <form method="post" action="{% url 'buyer_dispute_reply' dispute.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_message" class="form-label">Your Response</label>
+                {{ reply_form.message }}
+                {% if reply_form.message.errors %}
+                    <div class="text-danger mt-1">{{ reply_form.message.errors }}</div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-ah-primary">
+                <i class="bi bi-send"></i> Submit Reply
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- ===== RETURN TRACKING FORM (if return required) ===== -->
+{% if dispute.status == 'return_required' %}
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-truck"></i>Submit Return Tracking</h2>
+        <span class="badge-ah badge-ah-warning"><i class="bi bi-clock"></i> Awaiting Return</span>
+    </div>
+    <div class="ah-card-body">
+        <form method="post" action="{% url 'submit_return_tracking' dispute.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_return_courier" class="form-label">Return Courier Company</label>
+                {{ return_tracking_form.return_courier }}
+                {% if return_tracking_form.return_courier.errors %}
+                    <div class="text-danger mt-1">{{ return_tracking_form.return_courier.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="id_return_tracking" class="form-label">Return Tracking Number</label>
+                {{ return_tracking_form.return_tracking }}
+                {% if return_tracking_form.return_tracking.errors %}
+                    <div class="text-danger mt-1">{{ return_tracking_form.return_tracking.errors }}</div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-ah-primary">
+                <i class="bi bi-truck"></i> Submit Tracking Info
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- ===== UPLOAD MORE EVIDENCE ===== -->
+{% if dispute.status == 'awaiting_seller' or dispute.status == 'under_review' or dispute.status == 'more_info' or dispute.status == 'awaiting_buyer' %}
+<div class="ah-card">
+    <div class="ah-card-header">
+        <h2><i class="bi bi-cloud-arrow-up"></i>Upload Additional Evidence</h2>
+    </div>
+    <div class="ah-card-body">
+        <form method="post" action="{% url 'upload_dispute_evidence' dispute.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="upload-zone" onclick="document.getElementById('evidenceInput').click()">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+                <h4>Click to upload more evidence</h4>
+                <p>Maximum file size: 25MB per file. Up to 10 additional files.</p>
+                <input type="file" id="evidenceInput" name="evidence_files" multiple style="display: none;" accept="image/*,video/*,.pdf,.doc,.docx" onchange="this.form.submit()">
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- ===== ACTION BUTTONS ===== -->
+<div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items:center;">
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="{% url 'buyer_order' %}" class="btn btn-ah-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Orders
+        </a>
+        <a href="{% url 'buyer_order_detail' order.id order_item.seller.id %}" class="btn btn-ah-secondary">
+            <i class="bi bi-receipt"></i> View Order
+        </a>
+    </div>
+    <span style="font-size:13px; color:var(--gray-400);">
+        <i class="bi bi-lock"></i> Dispute ID: {{ dispute.dispute_id }}
+    </span>
+</div>
+
+<div style="margin-top: 40px; border-top: 1px solid var(--gray-200); padding-top: 24px; text-align:center; font-size:13px; color:var(--gray-400);">
+    <i class="bi bi-shield-lock"></i> AssetHub · Dispute detail · Buyer view
+</div>
+
+<script>
+// Auto-submit form when files are selected
+document.getElementById('evidenceInput')?.addEventListener('change', function() {
+    if (this.files.length > 0) {
+        this.closest('form').submit();
+    }
+});
+</script>
+
+{% endblock content %}

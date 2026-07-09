@@ -1,0 +1,350 @@
+
+
+
+{% extends 'buyer/buyer_base.html' %}
+{% load static %}
+
+{% block page_title %}My Orders{% endblock %}
+
+{% block content %}
+
+<div class="orders-list">
+
+    {% for g_order in grouped_orders %}
+    <div class="order-card">
+
+        <!-- HEADER -->
+        <div class="order-header">
+
+            <div class="order-meta-left">
+
+                <div class="order-meta-item">
+                    <span class="order-meta-label">Order Number</span>
+                    <span class="order-meta-value">#ORD-{{ g_order.order.id }}</span>
+                </div>
+
+                <div class="order-meta-item">
+                    <span class="order-meta-label">Placed On</span>
+                    <span class="order-meta-value">
+                        {{ g_order.order.created_at|date:"F d, Y" }}
+                    </span>
+                </div>
+
+                <div class="order-meta-item">
+                    <span class="order-meta-label">Status</span>
+
+                    <span class="status-badge status-{{ g_order.status|lower }}">
+
+                        {% if g_order.status == "Pending" %}
+                            <i class="fa-solid fa-clock"></i> Pending
+
+                        {% elif g_order.status == "Processing" %}
+                            <i class="fa-solid fa-cogs"></i> Processing
+
+                        {% elif g_order.status == "Shipped" %}
+                            <i class="fa-solid fa-truck"></i> Shipped
+
+                        {% elif g_order.status == "Delivered" %}
+                            <i class="fa-solid fa-box"></i> Delivered
+
+                        {% elif g_order.status == "Completed" %}
+                            <i class="fa-solid fa-check-circle"></i> Completed
+
+                        {% elif g_order.status == "Cancelled" %}
+                            <i class="fa-solid fa-xmark"></i> Cancelled
+                        {% endif %}
+
+                    </span>
+                </div>
+
+                
+
+            </div>
+
+            <div class="order-total-header">
+                ₦{{ g_order.total_amount|floatformat:2 }}
+            </div>
+
+        </div>
+
+        <!-- BODY -->
+        <div class="order-body">
+
+            <!-- GALLERY -->
+            <div class="product-gallery">
+                {% for product in g_order.gallery %}
+                    <div class="product-thumb">
+                        <img src="{{ product.image }}" alt="{{ product.name }}">
+                    </div>
+                {% endfor %}
+
+                {% if g_order.extra_count > 0 %}
+                    <div class="product-thumb more" data-more="+{{ g_order.extra_count }}">
+                        <img src="{{ g_order.gallery.0.image }}" alt="More products">
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- SUMMARY -->
+            <div class="product-summary">
+
+                <div class="product-summary-header">
+                    <div class="product-titles">
+                        <div class="product-main-title">
+                            {{ g_order.main_title }}
+                            {% if g_order.item_count > 1 %}
+                                and {{ g_order.item_count|add:"-1" }} other items
+                            {% endif %}
+                        </div>
+
+                        <div class="product-subtitle">
+                            {{ g_order.subtitle_titles }}
+                        </div>
+                    </div>
+
+                    <span class="product-count-badge">
+                        {{ g_order.item_count }} items
+                    </span>
+                </div>
+
+                <div class="seller-row">
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                    {% if g_order.order.order_type == "escrow" %}
+                        Protected by Escrow
+                    {% else %}
+                        Payment via WhatsApp
+                    {% endif %}
+
+                    • Sold by <strong>{{ g_order.seller.username }}</strong>
+                </div>
+
+                <div class="order-details-grid">
+
+                    <div class="detail-item">
+                        <i class="fa-solid fa-check-circle"></i>
+                        Status: {{ g_order.status }}
+                    </div>
+
+                    {% if g_order.order.order_type == "escrow" and g_order.status != "Completed" and g_order.status != "Cancelled" %}
+                    <div class="detail-item">
+                        <i class="fa-solid fa-lock"></i>
+                        Payment held until confirmed
+                    </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+
+<div class="order-footer">
+
+    <div style="margin-right:auto;font-weight:500;">
+        
+        <!-- TIMER / DISPUTE STATUS DISPLAY -->
+        <div class="order-meta-item">
+            <span class="order-meta-label">
+                {% if g_order.has_active_dispute %}
+                    <i class="fa-solid fa-shield-halved" style="color: var(--danger);"></i> Dispute Active
+                {% elif g_order.has_resolved_dispute %}
+                    <i class="fa-solid fa-gavel" style="color: var(--success);"></i> Resolved
+                {% else %}
+                    Time Left
+                {% endif %}
+            </span>
+
+            <!-- ACTIVE DISPUTE: Show dispute status, timer paused -->
+            {% if g_order.has_active_dispute %}
+                <span class="dispute-badge" style="color: var(--danger); font-weight: 600;">
+                    {% if g_order.active_dispute.status == 'awaiting_seller' %}
+                        Awaiting Seller Response
+                    {% elif g_order.active_dispute.status == 'under_review' %}
+                        Under Admin Review
+                    {% elif g_order.active_dispute.status == 'more_info' %}
+                        More Info Needed
+                    {% elif g_order.active_dispute.status == 'return_required' %}
+                        Return Required
+                    {% elif g_order.active_dispute.status == 'return_shipped' %}
+                        Return Shipped
+                    {% elif g_order.active_dispute.status == 'return_received' %}
+                        Return Received
+                    {% else %}
+                        {{ g_order.active_dispute.status|title }}
+                    {% endif %}
+                </span>
+                <div style="font-size: 11px; color: var(--gray-500); margin-top: 2px;">
+                    <i class="fa-solid fa-pause"></i> Timer paused during dispute
+                </div>
+
+            <!-- RESOLVED DISPUTE: Show final outcome, timer stopped -->
+            {% elif g_order.has_resolved_dispute %}
+                <span style="font-weight: 700; 
+                    {% if g_order.resolved_dispute.status == 'resolved_buyer' %}color: var(--success);
+                    {% elif g_order.resolved_dispute.status == 'resolved_seller' %}color: var(--danger);
+                    {% else %}color: var(--info);{% endif %}">
+                    
+                    {% if g_order.resolved_dispute.status == 'resolved_buyer' %}
+                        <i class="fa-solid fa-circle-check"></i> You Won — Refunded
+                    {% elif g_order.resolved_dispute.status == 'resolved_seller' %}
+                        <i class="fa-solid fa-circle-xmark"></i> Seller Won
+                    {% elif g_order.resolved_dispute.status == 'resolved_mutual' %}
+                        <i class="fa-solid fa-handshake"></i> Mutual Agreement
+                    {% endif %}
+                </span>
+                <div style="font-size: 11px; color: var(--gray-500); margin-top: 2px;">
+                    <i class="fa-solid fa-stop"></i> Resolved {{ g_order.resolved_dispute.resolved_at|timesince }} ago
+                </div>
+
+            <!-- NORMAL DELIVERED: Show countdown -->
+            {% elif g_order.status == "Delivered" %}
+                {% with g_order.items|first as first_item %}
+                    {% if first_item.expires_at %}
+                        <span class="countdown"
+                              data-expiry="{{ first_item.expires_at|date:'c' }}"
+                              data-state="running">
+                        </span>
+                    {% else %}
+                        <span>Waiting...</span>
+                    {% endif %}
+                {% endwith %}
+
+            {% elif g_order.status == "Completed" %}
+                <span style="color:green;"><i class="fa-solid fa-check-circle"></i> Completed</span>
+
+            {% elif g_order.status == "Cancelled" %}
+                <span style="color:red;"><i class="fa-solid fa-xmark"></i> Cancelled</span>
+
+            {% else %}
+                <span>No timer yet</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    {% if g_order.status == "Cancelled" %}
+        <span style="color:red;"><i class="fa-solid fa-xmark"></i> Cancelled</span>
+
+    {% else %}
+
+        <!-- 👁️ VIEW ORDER -->
+        <a href="{% url 'buyer_order_detail' g_order.order.id g_order.seller.id %}">
+            View Order
+        </a>
+
+        <!-- ACTIVE DISPUTE: View Dispute button -->
+        {% if g_order.has_active_dispute %}
+            <a href="{% url 'buyer_dispute_detail' g_order.active_dispute.id %}" 
+               class="btn btn-danger btn-sm">
+                <i class="fa-solid fa-gavel"></i> View Dispute
+            </a>
+
+        <!-- RESOLVED DISPUTE: Show outcome badge, no action needed -->
+        {% elif g_order.has_resolved_dispute %}
+            {% if g_order.resolved_dispute.status == 'resolved_buyer' %}
+                <span class="btn btn-success btn-sm" style="cursor: default;">
+                    <i class="fa-solid fa-money-bill-wave"></i> ${{ g_order.resolved_dispute.get_escrow_amount }} Refunded
+                </span>
+            {% elif g_order.resolved_dispute.status == 'resolved_seller' %}
+                <span class="btn btn-secondary btn-sm" style="cursor: default;">
+                    <i class="fa-solid fa-lock"></i> Funds Released to Seller
+                </span>
+            {% elif g_order.resolved_dispute.status == 'resolved_mutual' %}
+                <span class="btn btn-info btn-sm" style="cursor: default;">
+                    <i class="fa-solid fa-handshake"></i> Settled
+                </span>
+            {% endif %}
+
+        <!-- NORMAL: Confirm Received button (only if Delivered and no dispute) -->
+        {% elif g_order.status == "Delivered" %}
+            <form method="POST"
+                  action="{% url 'confirm_delivery' g_order.order.id g_order.seller.id %}"
+                  style="display:inline;">
+                {% csrf_token %}
+                <button class="btn btn-success btn-sm">
+                    <i class="fa-solid fa-check"></i> Confirm Received
+                </button>
+            </form>
+        {% endif %}
+
+        <!-- COMPLETED (non-dispute) -->
+        {% if g_order.status == "Completed" and not g_order.has_resolved_dispute %}
+            <span style="color:green;">
+                <i class="fa-solid fa-check-circle"></i> Order Completed
+            </span>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+    </div>
+
+    {% empty %}
+        <p>No orders found.</p>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    document.querySelectorAll('.countdown').forEach(el => {
+
+        const state = el.dataset.state;
+
+        // Don't run countdown for disputed or resolved orders
+        if (state !== "running") {
+            if (state === "paused") {
+                el.innerHTML = '<i class="fa-solid fa-pause"></i> Paused';
+            } else if (state === "resolved") {
+                el.innerHTML = '<i class="fa-solid fa-gavel"></i> Resolved';
+            }
+            return;
+        }
+
+        const expiry = new Date(el.dataset.expiry).getTime();
+
+        function update() {
+            const now = new Date().getTime();
+            const diff = expiry - now;
+
+            if (diff <= 0) {
+                el.innerHTML = "⛔ Timeout";
+                el.style.color = "red";
+
+                const card = el.closest('.order-card');
+                if (card) {
+                    card.style.opacity = "0.5";
+                    card.style.border = "1px solid red";
+                    card.querySelectorAll('button, a').forEach(btn => {
+                        btn.style.pointerEvents = "none";
+                        btn.style.opacity = "0.5";
+                    });
+                }
+                return;
+            }
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            let timeStr = "";
+            if (d > 0) timeStr += `${d}d `;
+            timeStr += `${h}h ${m}m ${s}s`;
+            el.innerHTML = timeStr;
+
+            if (diff < (1000 * 60 * 60 * 2)) { // Less than 2 hours
+                el.style.color = "red";
+                el.innerHTML = "⚠️ " + el.innerHTML;
+            }
+        }
+
+        update();
+        setInterval(update, 1000);
+    });
+</script>
+
+{% endblock %}

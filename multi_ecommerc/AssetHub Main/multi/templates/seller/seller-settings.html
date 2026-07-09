@@ -1,0 +1,357 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css"/>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header class="top-navbar">
+
+        <div class="navbar-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <h1 class="page-title">{% block page_title %}Settings{% endblock %}</h1>
+        </div>
+        
+        <div class="navbar-right">
+            
+            <a href="#" onclick="history.back(); return false;" class="btn-switch">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                <span>Return To Dashboard
+                </span>
+            </a>
+            
+            <button class="nav-icon-btn" id="notifBtn">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notification-dot"></span>
+                <div class="dropdown-menu" id="notifDropdown" style="width: 280px;">
+                    <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600;">
+                        Notifications
+                    </div>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <a href="#" class="dropdown-item" style="white-space: normal;">
+                            <div>
+                                <div style="font-weight: 500; margin-bottom: 0.25rem;">New Order Received</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-400);">Order #1234 is awaiting processing</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </button>
+            
+            <div class="profile-dropdown">
+                <button class="profile-btn" id="profileBtn">
+                    <div class="profile-info">
+                        <div class="profile-name">{{ request.user.get_full_name }}</div>
+                        <div class="profile-role">{% block profile_role %}Top Seller{% endblock %}</div>
+                    </div>
+                    <img src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Profile" class="profile-img">
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--gray-400);"></i>
+                </button>
+                <div class="dropdown-menu" id="profileDropdown">
+                    {% block profile_dropdown %}
+                    <a href="" class="dropdown-item">
+                        <i class="fa-solid fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="{% url 'home' %}" class="dropdown-item">
+                        <i class="fa-solid fa-home"></i>
+                        <span>Homepage</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="" class="dropdown-item" style="color: var(--danger);">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </a>
+                    {% endblock %}
+                </div>
+            </div>
+
+        </div>
+    </header>
+    <div class="page-content">
+            <div style="max-width: 800px; margin: 0 auto;">
+
+        <!-- Profile Settings -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+                <h3 class="card-title">Profile Information</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" id="profileForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="save_profile">
+
+                    <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        
+                        {% if request.user.profile_image %}
+                            <img src="{{ request.user.profile_image.url }}"
+                                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                            <img src="https://i.pravatar.cc/150?img=11"
+                                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                        {% endif %}
+
+                        <div>
+                            <input type="file" name="profile_image" style="display:none;" id="profileImageInput">
+                            <button type="button"
+                                    onclick="document.getElementById('profileImageInput').click();"
+                                    class="btn btn-secondary btn-sm"
+                                    style="margin-bottom: 0.5rem;">
+                                Change Photo
+                            </button>
+                            <p style="font-size: 0.75rem; color: var(--gray-500);">
+                                JPG, GIF or PNG. Max size 2MB
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name"
+                                   class="form-input"
+                                   value="{{ request.user.first_name }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name"
+                                   class="form-input"
+                                   value="{{ request.user.last_name }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email"
+                                   class="form-input"
+                                   value="{{ request.user.email }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" name="phone"
+                                   class="form-input"
+                                   id="phone"
+                                   value="{{ request.user.phone }}">
+                            <input type="hidden" name="full_phone" id="full_phone">
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bio</label>
+                        <textarea name="bio"
+                                  class="form-textarea"
+                                  rows="3">{{ request.user.bio }}</textarea>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- BECOME SELLER BUTTON (BUYER ONLY) -->
+        {% if request.user.role == "buyer" %}
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="become_seller">
+                        
+                        <input type="text"
+                            name="store_name"
+                            placeholder="Enter Store Name"
+                            class="form-input"
+                            style="margin-bottom: 1rem;"
+                            required>
+
+                        <div style="display:flex; justify-content:flex-end;">
+                            <button type="submit" class="btn btn-primary">
+                                Become a Seller
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+
+        {% if request.user.role == "seller" %}
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="become_buyer">
+
+                        <div style="display:flex; justify-content:flex-end;">
+                            <button type="submit" class="btn btn-primary">
+                                Become a Buyer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if request.user.role == "both" %}
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-body" style="display:flex; justify-content:space-between;">
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="remove_buyer">
+                        <button type="submit" class="btn btn-secondary">
+                            Remove Buyer Role
+                        </button>
+                    </form>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="remove_seller">
+                        <button type="submit" class="btn btn-secondary">
+                            Remove Seller Role
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Bank Details (SELLER OR BOTH ONLY) -->
+        {% if request.user.role == "seller" or request.user.role == "both" %}
+            <div class="card "style="display: none;">
+                <div class="card-header">
+                    <h3 class="card-title">Bank Account Details</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="update_bank">
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Account Holder Name</label>
+                                <input type="text"
+                                    name="account_holder_name"
+                                    class="form-input"
+                                    value="{{ bank.account_holder_name }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Bank Name</label>
+                                <input type="text"
+                                    name="bank_name"
+                                    class="form-input"
+                                    value="{{ bank.bank_name }}">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Account Number</label>
+                                <input type="text"
+                                    name="account_number"
+                                    class="form-input"
+                                    value="{{ bank.account_number }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Routing Number</label>
+                                <input type="text"
+                                    name="routing_number"
+                                    class="form-input"
+                                    value="{{ bank.routing_number }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Account Type</label>
+                            <select name="account_type" class="form-select">
+                                <option value="checking"
+                                    {% if bank.account_type == "checking" %}selected{% endif %}>
+                                    Checking
+                                </option>
+                                <option value="savings"
+                                    {% if bank.account_type == "savings" %}selected{% endif %}>
+                                    Savings
+                                </option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                            <button type="submit" class="btn btn-primary">
+                                Update Bank Info
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script src="{% static 'js/main.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+
+<script>
+const phoneInput = document.querySelector("#phone");
+const fullPhone = document.querySelector("#full_phone");
+
+const iti = window.intlTelInput(phoneInput, {
+    initialCountry: "auto",
+    geoIpLookup: function(callback) {
+        fetch("https://ipapi.co/json")
+        .then(res => res.json())
+        .then(data => callback(data.country_code))
+        .catch(() => callback("ng"));
+    },
+    preferredCountries: ["ng","us","gb"],
+    separateDialCode: true,
+    utilsScript:"https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+});
+
+document.querySelector("#profileForm").addEventListener("submit", function(){
+    fullPhone.value = iti.getNumber();
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+{% comment %} {% extends base_template %}
+{% load static %}
+
+{% block page_title %}Add Product{% endblock %}
+
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
+{% block extra_js  %}
+    
+{% endblock %} {% endcomment %}

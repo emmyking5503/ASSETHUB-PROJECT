@@ -1,0 +1,67 @@
+{% extends 'super_admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Reports - Super Admin{% endblock %}
+{% block reports_active %}active{% endblock %}
+
+{% block content %}
+<div class="users-table-container">
+    <div class="section-header">
+        <div>
+            <h2>Reports</h2>
+            <p>Handle reported products, sellers and suspicious activity.</p>
+        </div>
+        <form method="get" class="filter-form">
+            <input type="text" name="search" placeholder="Search reporter, email, or subject" value="{{ search_query }}">
+            <select name="status">
+                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                <option value="unread" {% if status_filter == 'unread' %}selected{% endif %}>Unread</option>
+                <option value="read" {% if status_filter == 'read' %}selected{% endif %}>Read</option>
+                <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved</option>
+            </select>
+            <button type="submit" class="action-btn">Filter</button>
+        </form>
+    </div>
+
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Reporter</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in page_obj %}
+            <tr>
+                <td>{{ report.full_name }}</td>
+                <td>{{ report.email }}</td>
+                <td>{{ report.subject|default:'No subject' }}</td>
+                <td>{{ report.get_message_type_display }}</td>
+                <td>{{ report.created_at|date:"Y-m-d" }}</td>
+                <td>{{ report.get_status_display }}</td>
+                <td><a href="{% url 'report_detail' report.id %}" class="action-btn">Open</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">No reports found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&status={{ status_filter }}"><button>◀</button></a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&status={{ status_filter }}"><button>▶</button></a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

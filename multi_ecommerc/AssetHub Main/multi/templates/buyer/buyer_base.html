@@ -1,0 +1,234 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Buyer Dashboard{% endblock %} - Nexus Marketplace</title>
+
+    <!-- Icons & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'css/buyer.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'buyer_dashboard' %}" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <div class="brand-text">Asset<span>
+Hub</span></div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+
+                <li class="nav-item">
+                    <a href="{% url 'buyer_dashboard' %}" 
+                       class="nav-link {% if request.resolver_match.url_name == 'buyer_dashboard' %}active{% endif %}">
+                        <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'buyer_order' %}" 
+                       class="nav-link {% if request.path == '/buyer/orders/' %}active{% endif %}">
+                        <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
+                        <span>My Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'user_notifications' %}" 
+                       class="nav-link {% if request.path == '/buyer/notifications/' %}active{% endif %}">
+                        <span class="nav-icon"><i class="fa-regular fa-bell"></i></span>
+                        <span>Notifications</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'wishlist' %}" 
+                       class="nav-link {% if request.path == '/wishlist/' %}active{% endif %}">
+                        <span class="nav-icon"><i class="fa-solid fa-heart"></i></span>
+                        <span>Wishlist</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'buyer_disputes' %}" 
+                       class="nav-link {% if request.path == '/dispute/' %}active{% endif %}">
+                        <span class="nav-icon"><i class="fa-solid fa-exclamation-triangle"></i></span>
+                        <span>Dispute</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'buyer_decisions_list' %}" 
+                       class="nav-link {% if request.path == '/buyer/decisions/' %}active{% endif %}">
+                        <span class="nav-icon"><i class="fa-solid fa-exclamation-triangle"></i></span>
+                        <span>Admin Decisions</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'buyer_wallet' %}" 
+                       class="nav-link {% if request.path == '/buyer/wallet/' %}active{% endif %}">
+                        <span class="nav-icon"><i class="fa-solid fa-wallet"></i></span>
+                        <span>Wallet</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="{% url 'user_settings' %}" 
+                       class="nav-link {% if request.resolver_match.url_name == 'buyer_settings' %}active{% endif %}">
+                        <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+                        <span>Settings</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+             <form method="POST" action="{% url 'logout' %}" id="logoutForm">
+                    {% csrf_token %}
+                    <a href="#" onclick="document.getElementById('logoutForm').submit();" class="nav-link" style="color: var(--danger);">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Logout
+                    </a>
+                </form>
+            
+        </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <div class="navbar-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+            </div>
+
+            <div class="navbar-right">
+
+                <!-- Switch to Seller -->
+                <a href="{% url 'seller_dashboard' %}" class="btn-my-shop">
+                    <i class="fa-solid fa-store"></i>
+                    <span>My Shop</span>
+                </a>
+
+                <!-- Profile -->
+               
+
+
+                    <button class="btn-notification" id="btnNotification">
+                        <i class="fa-regular fa-bell"></i>
+                        {% if dashboard_notifications_count > 0 %}
+                            <span class="notification-dot"></span>
+                        {% endif %}
+
+                        <!-- Notification Dropdown -->
+                        <div class="dropdown-menu" id="notificationDropdown">
+                            <div class="dropdown-header">
+                                <span class="dropdown-header-title">Notifications</span>
+                            </div>
+                            <ul class="dropdown-list">
+                                {% if dashboard_notifications %}
+                                    {% for item in dashboard_notifications %}
+                                        <li>
+                                            <a href="{% if item.url %}{{ item.url }}{% else %}#{% endif %}" class="dropdown-item">
+                                                <i class="fa-solid {{ item.icon }}"></i>
+                                                <span>{{ item.title }}</span>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li class="dropdown-empty">
+                                        <span>No new notifications</span>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <button class="btn-profile" id="btnProfile">
+                            <img src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Profile" class="profile-avatar">
+                            <div class="profile-info">
+                                <div class="profile-name">{{ request.user.get_full_name }}</div>
+                                <div class="profile-role">Buyer</div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down profile-arrow"></i>
+                            
+                            <!-- Profile Dropdown -->
+                            <div class="dropdown-menu" id="profileDropdown">
+                                <ul class="dropdown-list">
+                                    <li>
+                                        <a href="{% url 'user_settings' %}" class="dropdown-item">
+                                            <i class="fa-solid fa-user"></i>
+                                            <span>My Profile</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'home' %}" class="dropdown-item">
+                                            <i class="fa-solid fa-home"></i>
+                                            <span>Homepage</span>
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-divider"></li>
+                                    <li>
+                                        
+
+                                        <form method="POST" action="{% url 'logout' %}" id="logoutForm">
+                                            {% csrf_token %}
+                                            <a href="#" onclick="document.getElementById('logoutForm').submit();" class="nav-link" style="color: var(--danger);">
+                                                <i class="fa-solid fa-right-from-bracket"></i>
+                                                Logout
+                                            </a>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </button>
+                    </div>
+
+
+            </div>
+        </header>
+
+        <!-- ================= PAGE CONTENT BLOCK ================= -->
+        <div class="page-content">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+    </main>
+</div>
+
+<script src="{% static 'js/buyer.js' %}"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>
+
+
+
+
+
+

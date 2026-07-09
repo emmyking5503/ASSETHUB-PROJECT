@@ -1,0 +1,213 @@
+{% extends "seller/basee.html" %}
+{% load static %}
+
+{% block page_title %}Add Category{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ===============================
+   ADD CATEGORY PAGE STYLES
+=============================== */
+.page-content {
+    padding: 2rem;
+}
+
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.section-subtitle {
+    font-size: 0.875rem;
+    color: #6B7280;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-input, .form-textarea {
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
+}
+
+.upload-zone {
+    border: 2px dashed #D1D5DB;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    background-color: #F9FAFB;
+    position: relative;
+}
+
+.file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.image-preview {
+    margin-top: 1rem;
+    width: 150px;
+    height: 150px;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    display: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #4F46E5;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #4338CA;
+}
+
+.btn-secondary {
+    background-color: white;
+    color: #374151;
+    border: 1px solid #D1D5DB;
+}
+
+.btn-secondary:hover {
+    background-color: #F3F4F6;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data" action="{% url 'add_category' %}">
+                {% csrf_token %}
+
+            <section class="form-section">
+                <div class="section-header">
+                    <h2 class="section-title">Add New Category</h2>
+                    <p class="section-subtitle">Provide details for your new category</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="categoryName">Category Name <span style="color:red">*</span></label>
+                    <input type="text" id="categoryName" name="name" class="form-input" placeholder="e.g., Electronics" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="categoryDescription">Description <span style="color:#6B7280">(Optional)</span></label>
+                    <textarea id="categoryDescription" name="description" class="form-textarea" rows="3" placeholder="Describe this category..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category Image</label>
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" name="image" class="file-input" accept="image/*" id="categoryImageInput">
+                        <p>Click to upload or drag & drop</p>
+                    </div>
+                    <img id="categoryImagePreview" class="image-preview">
+                </div>
+
+            </section>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Category</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('categoryImageInput');
+    const preview = document.getElementById('categoryImagePreview');
+    const uploadZone = document.getElementById('uploadZone');
+
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    uploadZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        uploadZone.style.borderColor = '#4F46E5';
+        uploadZone.style.backgroundColor = '#EEF2FF';
+    });
+
+    uploadZone.addEventListener('dragleave', e => {
+        uploadZone.style.borderColor = '';
+        uploadZone.style.backgroundColor = '#F9FAFB';
+    });
+
+    uploadZone.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadZone.style.borderColor = '';
+        uploadZone.style.backgroundColor = '#F9FAFB';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            const event = new Event('change');
+            fileInput.dispatchEvent(event);
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% for product in products %}
+<div class="card" style="overflow: hidden; position: relative;">
+
+    <div style="position: relative;">
+        {% if product.front_image %}
+            <img src="{{ product.front_image.url }}" style="width:100%; height:200px; object-fit:cover;">
+        {% else %}
+            <img src="https://via.placeholder.com/500x200" style="width:100%; height:200px; object-fit:cover;">
+        {% endif %}
+
+        {% if product.quantity > 0 %}
+            <span class="badge badge-published" style="position:absolute; top:0.75rem; right:0.75rem;">Published</span>
+        {% else %}
+            <span class="badge badge-outofstock" style="position:absolute; top:0.75rem; right:0.75rem;">Out of Stock</span>
+        {% endif %}
+    </div>
+
+    <div style="padding:1.25rem;">
+        <h3 style="font-weight:600; margin-bottom:0.5rem;">{{ product.name }}</h3>
+        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+            <span style="font-size:1.125rem; font-weight:700; color:var(--primary);">${{ product.price }}</span>
+            <span style="font-size:0.875rem; color:var(--gray-500);">Stock: {{ product.quantity }}</span>
+        </div>
+
+        <div style="display:flex; gap:0.5rem;">
+            <a href="{% url 'edit_product' product.slug %}" class="btn btn-sm btn-secondary" style="flex:1;">Edit</a>
+
+            <button class="btn btn-sm btn-danger inline-delete" style="flex:1;">Delete</button>
+        </div>
+    </div>
+
+    <!-- Inline Delete Modal -->
+    <div class="inline-delete-modal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:1.5rem; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:10; width:90%; max-width:300px; text-align:center;">
+        <p>Are you sure you want to delete <strong>{{ product.name }}</strong>?</p>
+        <div style="margin-top:1rem; display:flex; justify-content:space-around;">
+            <button class="btn btn-secondary cancel-delete">Cancel</button>
+            <a href="{% url 'delete_product' product.slug %}" class="btn btn-danger confirm-delete">Delete</a>
+        </div>
+    </div>
+
+</div>
+{% empty %}
+<p>No products found.</p>
+{% endfor %}

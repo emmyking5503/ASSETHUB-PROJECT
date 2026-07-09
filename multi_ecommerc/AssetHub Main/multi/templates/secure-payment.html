@@ -1,0 +1,335 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment · Escrow Protection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static "css/secure-payment.css" %}">
+    <style>
+        .discount-price{
+            font-size:15px;
+            font-weight:700;
+            color:#e63946;
+        }
+
+        .original-price{
+            font-size:12px;
+            text-decoration:line-through;
+            color:#888;
+            margin-left:6px;
+        }
+
+        .normal-price{
+            font-size:10px;
+            font-weight:700;
+            color:#111;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="payment-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">market<span>place</span></a>
+                <div class="secure-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Escrow Payment</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="payment-main">
+        <div class="container">
+            <div class="payment-grid">
+                <!-- LEFT SECTION - ORDER SUMMARY -->
+                <div class="order-summary">
+                    <div class="escrow-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="badge-text">
+                            <strong>Secure Escrow Protection</strong>
+                            <span>Your payment is held securely until you confirm delivery</span>
+                        </div>
+                    </div>
+
+                    {% for item in items %}
+                    <div class="product-card">
+                        <div class="product-image">
+                             <img src="{{ item.product.front_image.url }}" alt="{{ item.product.name }}">
+                        </div>
+
+                        <div class="product-details">
+                            <h2 class="product-title">
+                                {{ item.product.name }}
+                            </h2>
+                            
+                            <div class="product-meta">
+                                <div class="meta-row">
+                                    <span>Quantity:</span>
+                                    <span class="meta-value">{{ item.quantity }}</span>
+                                </div>
+
+                                <div class="meta-row" >
+                                    <span>Price per item:</span>
+
+                                    <span class="meta-value">
+
+                                        {% if item.product.old_price %}
+
+                                            <span class="discount-price">
+                                                ${{ item.product.price|floatformat:2 }} × {{ item.quantity }}
+                                            </span>
+
+                                            <span class="original-price">
+                                                ${{ item.product.old_price }}
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="normal-price">
+                                                ${{ item.product.price|floatformat:2 }} × {{ item.quantity }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="price-breakdown">
+                        <h3>Payment Summary</h3>
+
+                        <div class="price-row">
+                            <span>Subtotal</span>
+                            <span>{{ subtotal|floatformat:2 }}</span>
+                        </div>
+
+                        <div class="price-row">
+                            <span>Platform Fee <span class="fee-rate">(2.5%)</span></span>
+                            <span>${{ fee }}</span>
+                        </div>
+
+                        <div class="price-row total">
+                            <span>Total Amount</span>
+                            <span class="total-amount">${{ total }}</span>
+                        </div>
+                    </div>
+
+                    <div class="protection-badges">
+                        <div class="protection-item">
+                            <i class="fas fa-lock"></i>
+                            <span>SSL Secure</span>
+                        </div>
+                        <div class="protection-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>100% Buyer Protection</span>
+                        </div>
+                        <div class="protection-item">
+                            <i class="fas fa-gavel"></i>
+                            <span>Dispute Resolution</span>
+                        </div>
+                        <div class="protection-item">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Encrypted Transaction</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT SECTION - PAYMENT FORM -->
+                <div class="payment-form-section">
+                    <h2 class="form-title">Payment Details</h2>
+                    
+                    <form method="POST" action="{% url 'process_payment' %}" class="payment-form" id="paymentForm">
+                        {% csrf_token %}    
+                        <!-- Full Name -->
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" name="fullName" value="{{ request.user.first_name }} {{ request.user.last_name }}" required>                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" name="email" value="{{ request.user.email }}" required>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" name="phone" value="{{ request.user.phone }}" required>
+                        </div>
+
+                        <!-- Keep shipping data available in the payment POST -->
+                        <input type="hidden" name="fullname" value="{{ shipping_info.fullname|default:'' }}">
+                        <input type="hidden" name="email" value="{{ shipping_info.email|default:request.user.email }}">
+                        <input type="hidden" name="phone" value="{{ shipping_info.phone|default:request.user.phone }}">
+                        <input type="hidden" name="address" value="{{ shipping_info.address|default:'' }}">
+                        <input type="hidden" name="city" value="{{ shipping_info.city|default:'' }}">
+                        <input type="hidden" name="state" value="{{ shipping_info.state|default:'' }}">
+                        <input type="hidden" name="country" value="{{ shipping_info.country|default:'' }}">
+                        <input type="hidden" name="zip" value="{{ shipping_info.zip|default:'' }}">
+                        <input type="hidden" name="instructions" value="{{ shipping_info.instructions|default:'' }}">
+
+                        <!-- Payment Method -->
+                        <div class="form-group">
+                            <label for="paymentMethod">Payment Method</label>
+                            <select id="paymentMethod" name="paymentMethod" class="payment-select" required>
+                                <option value="" disabled>Select payment method</option>
+                                <option value="card">Card Payment</option>
+                            </select>
+                        </div>
+
+                        <!-- Dynamic Payment Fields -->
+                        <div id="paymentFieldsContainer" class="payment-fields-container">
+                            <!-- Bank Transfer -->
+                            <div id="bankFields" class="payment-fields active">
+                                <div class="card-form">
+                                    <div class="card-icons">
+                                        <i class="fab fa-cc-visa"></i>
+                                        <i class="fab fa-cc-mastercard"></i>
+                                        <i class="fab fa-cc-amex"></i>
+                                        <i class="fab fa-cc-discover"></i>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="cardNumber">Card Number</label>
+                                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="expiry">Expiry Date</label>
+                                            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cvv">CVV</label>
+                                            <input type="text" id="cvv" placeholder="123" maxlength="4">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="cardName">Name on Card</label>
+                                        <input type="text" id="cardName" placeholder="John Doe">
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+
+                            
+                        </div>
+
+                       
+
+                        <!-- Submit Button -->
+                        
+                        <button type="submit" class="submit-btn"  id="submitPayment">
+                            <i class="fas fa-lock"></i>
+                            Complete Secure Payment
+                        </button>
+
+                        <!-- Secure Note -->
+                        <div class="secure-note">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Your payment is protected by escrow. Funds only released after you confirm delivery.</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="modal-title">Payment Received Successfully!</h2>
+            <p class="modal-message">
+                Your funds are being held securely.<br>
+                The seller will be notified.<br>
+                You will confirm delivery before funds are released.
+            </p>
+            <div class="modal-escrow-note">
+                <i class="fas fa-shield-alt"></i>
+                <span>Escrow Protection Active</span>
+            </div>
+            <a href="/" class="modal-btn">
+                Return to Homepage
+            </a>
+            <button class="modal-close-btn" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="payment-footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Help Center</a>
+                <a href="#">Security</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Contact Support</a>
+            </div>
+            <p class="copyright">&copy; 2024 Marketplace. All rights reserved. Escrow protected.</p>
+        </div>
+    </footer>
+    <script>
+/* =========================
+   CARD NUMBER FORMAT
+   1234 5678 9012 3456
+========================= */
+const cardInput = document.getElementById("cardNumber");
+
+cardInput.addEventListener("input", function (e) {
+    let value = this.value.replace(/\D/g, ""); // remove non-digits
+    value = value.substring(0, 16); // limit 16 digits
+
+    let formatted = value.match(/.{1,4}/g);
+    this.value = formatted ? formatted.join(" ") : "";
+});
+
+/* =========================
+   CVV ONLY NUMBERS
+========================= */
+const cvvInput = document.getElementById("cvv");
+
+cvvInput.addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, "").substring(0, 4);
+});
+
+/* =========================
+   EXPIRY DATE FORMAT MM/YY
+========================= */
+const expiryInput = document.getElementById("expiry");
+
+expiryInput.addEventListener("input", function (e) {
+    let value = this.value.replace(/\D/g, ""); // only numbers
+
+    if (value.length >= 3) {
+        this.value = value.substring(0, 2) + "/" + value.substring(2, 4);
+    } else {
+        this.value = value;
+    }
+
+    this.value = this.value.substring(0, 5);
+});
+</script>
+    {% comment %} <script src="{% static "js/secure-payment.js" %}"></script> {% endcomment %}
+</body>
+</html>

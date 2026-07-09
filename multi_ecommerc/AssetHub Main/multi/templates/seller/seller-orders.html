@@ -1,0 +1,642 @@
+
+
+    
+{% extends "seller/basee.html" %}
+{% load static %}
+
+{% block page_title %}My Orders{% endblock %}
+
+{% block extra_css %}
+
+<style>
+            
+        
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #1d1d1f;
+        }
+
+        /* Order Card - Clean, minimal design */
+        .order-card {
+            background: #ffffff;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+
+        /* Order Header - Dark strip with key info */
+        .order-header {
+            background: #1d1d1f;
+            color: #fff;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .order-meta-left {
+            display: flex;
+            gap: 24px;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .order-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .order-meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #86868b;
+            font-weight: 500;
+        }
+
+        .order-meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .order-total-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .status-shipped {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-completed {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-escrow {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .status-whatsapp {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        /* Order Body */
+        .order-body {
+            padding: 24px;
+        }
+
+        /* Product Gallery - Horizontal scroll or grid */
+        .product-gallery {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .product-gallery::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .product-gallery::-webkit-scrollbar-track {
+            background: #f5f5f7;
+            border-radius: 3px;
+        }
+
+        .product-gallery::-webkit-scrollbar-thumb {
+            background: #d2d2d7;
+            border-radius: 3px;
+        }
+
+        .product-thumb {
+            position: relative;
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f7;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .product-thumb:hover {
+            transform: scale(1.02);
+        }
+
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* More overlay on last visible item */
+        .product-thumb.more {
+            position: relative;
+        }
+
+        .product-thumb.more::after {
+            content: attr(data-more);
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Product List Summary */
+        .product-summary {
+            border-top: 1px solid #d2d2d7;
+            padding-top: 20px;
+        }
+
+        .product-summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .product-titles {
+            flex: 1;
+        }
+
+        .product-main-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .product-subtitle {
+            font-size: 14px;
+            color: #86868b;
+        }
+
+        .product-count-badge {
+            background: #f5f5f7;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1d1d1f;
+            white-space: nowrap;
+        }
+
+        .seller-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #86868b;
+            margin-bottom: 16px;
+        }
+
+        .seller-row i {
+            color: #0071e3;
+        }
+
+        /* Order Details Grid */
+        .order-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            font-size: 13px;
+            color: #86868b;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-item i {
+            width: 16px;
+            color: #86868b;
+        }
+
+        /* Order Footer */
+        .order-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #d2d2d7;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #fafafa;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #1d1d1f;
+            border: 1px solid #d2d2d7;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+        }
+
+        .btn-primary {
+            background: #0071e3;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #0077ed;
+        }
+
+        .btn-success {
+            background: #34c759;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #30b350;
+        }
+
+        .btn-danger {
+            background: #fff;
+            color: #ff3b30;
+            border: 1px solid #ff3b30;
+        }
+
+        .btn-danger:hover {
+            background: #ff3b30;
+            color: #fff;
+        }
+
+        /* Type indicator in header */
+        .order-type-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #86868b;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid #424245;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .order-header {
+                padding: 16px;
+            }
+
+            .order-meta-left {
+                gap: 16px;
+                width: 100%;
+            }
+
+            .order-body {
+                padding: 16px;
+            }
+
+            .product-thumb {
+                width: 88px;
+                height: 88px;
+            }
+
+            .order-footer {
+                padding: 16px;
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+   
+   
+              <!-- FILTER TABS -->
+<div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;overflow-x:auto;padding-bottom:0.5rem;">
+
+    <a href="?filter=all"
+       class="btn {% if active_filter == 'all' %}btn-primary{% else %}btn-secondary{% endif %}">
+        All ({{ counts.all }})
+    </a>
+
+    <a href="?filter=escrow"
+       class="btn {% if active_filter == 'escrow' %}btn-primary{% else %}btn-secondary{% endif %}">
+        Escrow ({{ counts.escrow }})
+    </a>
+
+    <a href="?filter=whatsapp"
+       class="btn {% if active_filter == 'whatsapp' %}btn-primary{% else %}btn-secondary{% endif %}">
+        WhatsApp ({{ counts.whatsapp }})
+    </a>
+
+    <a href="?filter=pending"
+       class="btn {% if active_filter == 'pending' %}btn-primary{% else %}btn-secondary{% endif %}">
+        Pending ({{ counts.pending }})
+    </a>
+
+    <a href="?filter=processing"
+       class="btn {% if active_filter == 'processing' %}btn-primary{% else %}btn-secondary{% endif %}">
+        Processing ({{ counts.processing }})
+    </a>
+
+    <a href="?filter=shipped"
+       class="btn {% if active_filter == 'shipped' %}btn-primary{% else %}btn-secondary{% endif %}">
+        Shipped ({{ counts.shipped }})
+    </a>
+
+    <a href="?filter=completed"
+       class="btn {% if active_filter == 'completed' %}btn-primary{% else %}btn-secondary{% endif %}">
+        Completed ({{ counts.completed }})
+    </a>
+
+</div>
+
+<!-- ORDERS LIST -->
+<div class="orders-list">
+
+    {% for order in grouped_orders %}
+    <div class="order-card">
+
+        <!-- HEADER -->
+        <div class="order-header">
+            <div class="order-meta-left">
+
+                <div class="order-meta-item">
+                    <span class="order-meta-label">Order Number</span>
+                    <span class="order-meta-value">#ORD-{{ order.order.id }}</span>
+                </div>
+
+                <div class="order-meta-item">
+                    <span class="order-meta-label">Placed On</span>
+                    <span class="order-meta-value">
+                        {{ order.order.created_at|date:"F d, Y" }}
+                    </span>
+                </div>
+
+                <div class="order-meta-item">
+                    <span class="order-meta-label">Status</span>
+
+                    <span class="status-badge status-{{ order.status|lower }}">
+
+                        {% if order.status == "Pending" %}
+                            ⏳ Pending
+
+                        {% elif order.status == "Processing" %}
+                            🔄 Processing
+
+                        {% elif order.status == "Shipped" %}
+                            🚚 Shipped
+
+                        {% elif order.status == "Delivered" %}
+                            📦 Delivered
+
+                        {% elif order.status == "Completed" %}
+                            ✅ Completed
+
+                        {% elif order.status == "Cancelled" %}
+                            ❌ Cancelled
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+               
+            </div>
+
+            <div class="order-total-header">
+                ₦{{ order.total|floatformat:2 }}
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="order-body">
+
+            <!-- GALLERY -->
+            <div class="product-gallery">
+                {% for product in order.gallery %}
+                    <div class="product-thumb">
+                        <img src="{{ product.image }}">
+                    </div>
+                {% endfor %}
+
+                {% if order.extra_count > 0 %}
+                    <div class="product-thumb more" data-more="+{{ order.extra_count }}">
+                        <img src="{{ order.gallery.0.image }}">
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- SUMMARY -->
+            <div class="product-summary">
+
+                <div class="product-summary-header">
+
+                    <div class="product-titles">
+                        <div class="product-main-title">
+                            {{ order.main_title }}
+                            {% if order.count > 1 %}
+                                and {{ order.count|add:"-1" }} other items
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <span class="product-count-badge">
+                        {{ order.count }} items
+                    </span>
+
+                </div>
+
+                <div class="seller-row">
+                    Buyer: <strong>{{ order.order.buyer.username }}</strong>
+                </div>
+
+                <div class="order-details-grid">
+                    <div class="detail-item">
+                        Status: {{ order.status }}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="order-footer">
+            <div style="margin-right:auto;font-weight:500;">
+                 <!-- ⏰ COUNTDOWN -->
+                <div class="order-meta-item">
+                    <span class="order-meta-label">Time Left</span>
+
+                    {% if order.status == "Delivered" %}
+
+                        {% with order.items|first as first_item %}
+
+                            {% if first_item.expires_at %}
+
+                                <span class="countdown"
+                                    data-expiry="{{ first_item.expires_at|date:'c' }}">
+                                </span>
+
+                            {% else %}
+                                <span>Waiting...</span>
+                            {% endif %}
+
+                        {% endwith %}
+
+                    {% elif order.status == "Completed" %}
+                        <span style="color:green;">✅ Completed</span>
+
+                    {% elif order.status == "Cancelled" %}
+                        <span style="color:red;">❌ Cancelled</span>
+
+                    {% else %}
+                        <span>No timer yet</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if order.status == "Cancelled" %}
+                <span style="color:red;"class="btn btn-secondary">Ended</span>
+            {% else %}
+                <a href="{% url 'seller_order_detail' order.items.0.id %}"
+                    class="btn btn-secondary">
+                        View Details
+                </a>
+            {% endif %}
+
+            {% if order.status == "Cancelled" or order.status == "Completed" %}
+
+                <form method="POST" action="{% url 'seller_delete_order' order.items.0.id %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-danger btn-sm"
+                            onclick="return confirm('Remove this order from your list?')">
+                        Delete
+                    </button>
+                </form>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    {% empty %}
+        <p>No orders found.</p>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+{% block extra_js  %}
+<script>
+    document.querySelectorAll('.countdown').forEach(el => {
+
+        const expiry = new Date(el.dataset.expiry).getTime();
+
+        function update() {
+
+            const now = new Date().getTime();
+            const diff = expiry - now;
+
+            if (diff <= 0) {
+
+                el.innerHTML = "⛔ Timeout";
+
+                const card = el.closest('.order-card');
+
+                if (card) {
+                    card.style.opacity = "0.5";
+                    card.style.border = "1px solid red";
+
+                    card.querySelectorAll('button, a').forEach(btn => {
+                        btn.style.pointerEvents = "none";
+                        btn.style.opacity = "0.5";
+                    });
+                }
+
+                return;
+            }
+
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            el.innerHTML = `${h}h ${m}m ${s}s`;
+
+            if (h < 2) {
+                el.style.color = "red";
+                el.innerHTML = "⚠️ " + el.innerHTML;
+            }
+        }
+
+        update();
+        setInterval(update, 1000);
+
+    });
+</script>
+{% endblock %}
+
+
+            

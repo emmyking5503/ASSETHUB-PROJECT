@@ -1,0 +1,783 @@
+{% extends 'seller/basee.html' %}
+{% load static %}
+{% block extra_css %}
+
+<style>
+/* Root Variables - Light Theme Based on AssetHub Design */
+:root {
+  /* Primary Colors - Light Theme */
+  --bg-primary: #f0f2f5;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8f9fa;
+  --bg-input: #ffffff;
+  --bg-header: #1a2332;
+  
+  /* Border Colors */
+  --border-color: #e2e8f0;
+  --border-light: #edf2f7;
+  
+  /* Text Colors */
+  --text-primary: #1a2332;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --text-dim: #a0aec0;
+  
+  /* Accent Colors - Blue Theme (AssetHub style) */
+  --accent-blue: #2563eb;
+  --accent-blue-light: #dbeafe;
+  --accent-blue-bg: #eff6ff;
+  
+  /* Accent Colors - Green */
+  --accent-green: #059669;
+  --accent-green-light: #d1fae5;
+  
+  /* Accent Colors - Orange */
+  --accent-orange: #d97706;
+  --accent-orange-light: #fef3c7;
+  
+  /* Accent Colors - Purple */
+  --accent-purple: #7c3aed;
+  --accent-purple-light: #ede9fe;
+  
+  /* Accent Colors - Red */
+  --accent-red: #dc2626;
+  --accent-red-light: #fee2e2;
+  
+  /* Box Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================
+   PAGE CONTAINER & LAYOUT
+   ============================================ */
+.page-content {
+  padding: 24px 32px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ============================================
+   BREADCRUMB NAVIGATION
+   ============================================ */
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-nav a:hover {
+  color: var(--accent-blue);
+}
+
+.breadcrumb-nav i {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.breadcrumb-nav .active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ============================================
+   ALERT / URGENT NOTICE
+   ============================================ */
+.alert-danger {
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.alert-danger .d-flex {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 16px;
+}
+
+.alert-danger .bi-exclamation-triangle-fill {
+  color: #dc2626;
+  font-size: 28px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.alert-danger h5 {
+  color: #991b1b;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.alert-danger p {
+  color: #7f1d1d;
+  margin-bottom: 4px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.alert-danger p strong {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+/* ============================================
+   DETAIL CARDS
+   ============================================ */
+.detail-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.detail-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.detail-card[style*="border-left:3px solid #dc2626;"] {
+  border-left: 3px solid #dc2626 !important;
+}
+
+.detail-card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+}
+
+.detail-card-header[style*="background:#fef2f2;"] {
+  background: #fef2f2 !important;
+}
+
+.detail-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.detail-card-title i {
+  color: var(--accent-blue);
+  font-size: 18px;
+}
+
+.detail-card-body {
+  padding: 20px 24px;
+  background: var(--bg-card);
+}
+
+/* ============================================
+   PRODUCT INFO SECTION
+   ============================================ */
+.detail-card-body .d-flex.align-items-center.gap-3 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+.detail-card-body img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.detail-card-body .bi-box {
+  font-size: 2rem;
+  color: var(--text-muted);
+}
+
+.detail-card-body .fw-600 {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.detail-card-body .text-muted {
+  color: var(--text-muted) !important;
+  font-size: 13px;
+}
+
+.detail-card-body .text-danger {
+  color: var(--accent-red) !important;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* ============================================
+   FORM STYLES
+   ============================================ */
+.form-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.text-danger {
+  color: #dc2626 !important;
+}
+
+.form-control {
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  resize: vertical;
+  width: 100%;
+  font-size: 14px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-control::placeholder {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+textarea.form-control {
+  min-height: 120px;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.form-text {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+  box-shadow: 0 1px 2px rgba(220, 38, 38, 0.3);
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+  color: white;
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-danger i {
+  font-size: 16px;
+}
+
+.btn-outline-secondary {
+  background: transparent;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn-outline-secondary:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+.d-flex.gap-2 {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+/* ============================================
+   SIDEBAR / STICKY CARDS
+   ============================================ */
+.position-sticky {
+  position: sticky;
+  top: 20px;
+}
+
+/* Deadline Card */
+.detail-card[style*="border-left:3px solid #dc2626;"] .detail-card-body.text-center {
+  text-align: center !important;
+  padding: 24px;
+}
+
+.detail-card .text-center .fs-1 {
+  font-size: 48px;
+  font-weight: 700;
+  color: #dc2626;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.detail-card .text-center .text-muted {
+  font-size: 14px;
+  color: var(--text-muted) !important;
+  margin-bottom: 12px;
+}
+
+.detail-card .text-center .text-danger {
+  color: #991b1b !important;
+  font-size: 13px;
+}
+
+.detail-card .text-center .text-danger i {
+  margin-right: 4px;
+}
+
+/* Consequences Card */
+.detail-card ul {
+  padding-left: 20px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 2;
+}
+
+.detail-card ul li {
+  margin-bottom: 4px;
+}
+
+.detail-card ul li strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ============================================
+   GRID SYSTEM (Bootstrap-like)
+   ============================================ */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -12px;
+}
+
+.col-lg-8 {
+  flex: 0 0 66.666667%;
+  max-width: 66.666667%;
+  padding: 0 12px;
+}
+
+.col-lg-4 {
+  flex: 0 0 33.333333%;
+  max-width: 33.333333%;
+  padding: 0 12px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1024px) {
+  .page-content {
+    padding: 20px;
+  }
+  
+  .col-lg-8,
+  .col-lg-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  .position-sticky {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    padding: 16px;
+  }
+
+  .breadcrumb-nav {
+    font-size: 13px;
+    padding: 12px 0;
+  }
+
+  .alert-danger {
+    padding: 16px 20px;
+  }
+
+  .alert-danger .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+
+  .alert-danger .bi-exclamation-triangle-fill {
+    font-size: 24px;
+  }
+
+  .alert-danger h5 {
+    font-size: 16px;
+  }
+
+  .alert-danger p {
+    font-size: 14px;
+  }
+
+  .detail-card-header {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .detail-card-body {
+    padding: 16px;
+  }
+
+  .detail-card-body .d-flex.align-items-center.gap-3 {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .detail-card-body img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .d-flex.gap-2 {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .detail-card .text-center .fs-1 {
+    font-size: 36px;
+  }
+
+  .form-control {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .col-lg-8,
+  .col-lg-4 {
+    padding: 0 8px;
+  }
+
+  .row {
+    margin: 0 -8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-content {
+    padding: 12px;
+  }
+
+  .breadcrumb-nav {
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .breadcrumb-nav i {
+    font-size: 10px;
+  }
+
+  .alert-danger {
+    padding: 12px 16px;
+  }
+
+  .alert-danger h5 {
+    font-size: 15px;
+  }
+
+  .alert-danger p {
+    font-size: 13px;
+  }
+
+  .detail-card-body {
+    padding: 12px 14px;
+  }
+
+  .detail-card-title {
+    font-size: 14px;
+  }
+
+  .detail-card-title i {
+    font-size: 16px;
+  }
+
+  .detail-card ul {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .detail-card .text-center .fs-1 {
+    font-size: 32px;
+  }
+
+  .btn {
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+
+  textarea.form-control {
+    min-height: 100px;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING - Light Theme
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detail-card {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.alert-danger {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.mb-4 { margin-bottom: 24px; }
+.mb-3 { margin-bottom: 16px; }
+.mb-2 { margin-bottom: 8px; }
+.mt-3 { margin-top: 16px; }
+.mt-2 { margin-top: 8px; }
+.gap-3 { gap: 16px; }
+.gap-2 { gap: 8px; }
+.text-center { text-align: center; }
+.fw-semibold { font-weight: 600; }
+.fs-2 { font-size: 2rem; }
+
+/* Bootstrap Icon Overrides */
+.bi {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.bi-chevron-right {
+  font-size: 12px;
+}
+
+/* Placeholder styling for dark text on light background */
+::placeholder {
+  color: #a0aec0;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: #a0aec0;
+}
+
+::-ms-input-placeholder {
+  color: #a0aec0;
+}
+</style>
+{% endblock extra_css %}
+{% block content %}
+<div class="page-content">
+    <nav class="breadcrumb-nav">
+        <a href="{% url 'seller_dashboard' %}">Dashboard</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'seller_disputes' %}">Disputes</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'seller_dispute_detail' dispute.id %}">#{{ dispute.dispute_id }}</a>
+        <i class="bi bi-chevron-right"></i>
+        <span class="active">Submit Return Address</span>
+    </nav>
+
+    <!-- URGENT Alert -->
+    <div class="alert alert-danger mb-4" style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;">
+        <div class="d-flex align-items-start gap-3">
+            <i class="bi bi-exclamation-triangle-fill" style="color:#dc2626;font-size:28px;"></i>
+            <div>
+                <h5 style="color:#991b1b;margin-bottom:8px;">URGENT: Return Address Required</h5>
+                <p style="color:#7f1d1d;margin-bottom:4px;">
+                    You lost dispute <strong>#{{ dispute.dispute_id }}</strong>. The admin has ruled in favor of the buyer.
+                </p>
+                <p style="color:#7f1d1d;margin-bottom:0;">
+                    You must provide your return shipping address within <strong>5 day{{ days_remaining|pluralize }}</strong> 
+                    or the buyer will keep the item <strong>AND</strong> receive the full refund.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Product Info -->
+            <div class="detail-card mb-4">
+                <div class="detail-card-header">
+                    <div class="detail-card-title"><i class="bi bi-box-seam"></i> Product to be Returned</div>
+                </div>
+                <div class="detail-card-body">
+                    <div class="d-flex align-items-center gap-3">
+                        {% if product.front_image %}
+                            <img src="{{ product.front_image.url }}" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:10px;">
+                        {% else %}
+                            <div style="width:80px;height:80px;background:var(--bg-sidebar);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                                <i class="bi bi-box fs-2" style="color:var(--text-muted);"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <div style="font-weight:600;font-size:16px;">{{ product.name }}</div>
+                            <div style="color:var(--text-muted);font-size:13px;">Order #{{ dispute.order_item.order.id }}</div>
+                            <div style="color:var(--accent-red);font-weight:600;font-size:14px;margin-top:4px;">
+                                Refund Amount: ${{ dispute.get_escrow_amount }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Form -->
+            <div class="detail-card mb-4" style="border-left:3px solid #dc2626;">
+                <div class="detail-card-header" style="background:#fef2f2;">
+                    <div class="detail-card-title"><i class="bi bi-geo-alt"></i> Your Return Shipping Address</div>
+                </div>
+                <div class="detail-card-body">
+                    <form method="post" action="{% url 'seller_submit_return_address' dispute.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="color:var(--text-primary);">
+                                Full Return Address <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="seller_return_address" class="form-control" rows="4" required
+                                      placeholder="Enter your complete return address including:
+• Recipient name
+• Street address
+• City, State, ZIP
+• Country
+• Phone number (optional)"
+                                      style="padding:12px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-input);color:var(--text-primary);resize:vertical;"></textarea>
+                            <div class="form-text" style="color:var(--text-muted);font-size:12px;">
+                                This address will be shared with the buyer so they can ship the item back to you.
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger" style="padding:10px 24px;">
+                                <i class="bi bi-send"></i> Submit Return Address
+                            </button>
+                            <a href="{% url 'seller_dispute_detail' dispute.id %}" class="btn btn-outline-secondary" style="padding:10px 24px;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div style="position:sticky;top:20px;">
+                <!-- Deadline Card -->
+                <div class="detail-card mb-3" style="border-left:3px solid #dc2626;">
+                    <div class="detail-card-header" style="background:#fef2f2;">
+                        <div class="detail-card-title"><i class="bi bi-clock"></i> Deadline</div>
+                    </div>
+                    <div class="detail-card-body text-center">
+                        <div style="font-size:48px;font-weight:700;color:#dc2626;">5</div>
+                        <div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">days remaining</div>
+                       
+                    </div>
+                </div>
+
+                <!-- Consequences Card -->
+                <div class="detail-card mb-3">
+                    <div class="detail-card-header">
+                        <div class="detail-card-title"><i class="bi bi-shield-exclamation"></i> If You Don't Submit</div>
+                    </div>
+                    <div class="detail-card-body">
+                        <ul style="padding-left:20px;margin:0;color:var(--text-secondary);font-size:14px;line-height:2;">
+                            <li>Buyer keeps the item</li>
+                            <li>Buyer gets full refund of <strong>${{ dispute.get_escrow_amount }}</strong></li>
+                            <li>You lose both product and payment</li>
+                            <li>Case closed automatically</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
